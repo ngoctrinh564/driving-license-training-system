@@ -1,0 +1,64 @@
+﻿@model dacn_gplx.Models.HangGplx
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Thêm hạng GPLX";
+}
+
+<div class="card">
+
+    <div class="card-body">
+        <form asp-controller="HangGPLX" asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+
+            <!-- Tenhang -->
+            <div class="form-group">
+                <label>Tên Hạng</label>
+                <input asp-for="Tenhang" class="form-control" />
+                <span asp-validation-for="Tenhang" class="text-danger"></span>
+            </div>
+
+            <!-- Mota -->
+            <div class="form-group">
+                <label>Mô tả</label>
+                <input asp-for="Mota" class="form-control" />
+                <span asp-validation-for="Mota" class="text-danger"></span>
+            </div>
+
+            <!-- Loaiphuongtien -->
+            <div class="form-group">
+                <label>Loại phương tiện</label>
+                <input asp-for="Loaiphuongtien" class="form-control" />
+                <span asp-validation-for="Loaiphuongtien" class="text-danger"></span>
+            </div>
+
+            <!-- Thoihanlythuyet -->
+            <div class="form-group">
+                <label>Thời hạn lý thuyết (giờ)</label>
+                <input asp-for="Thoihanlythuyet" class="form-control" />
+            </div>
+
+            <!-- Thoihanthuchanh -->
+            <div class="form-group">
+                <label>Thời hạn thực hành (giờ)</label>
+                <input asp-for="Thoihanthuchanh" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label>Học Phí</label>
+                <input asp-for="Hocphi" class="form-control" />
+                <span asp-validation-for="Hocphi" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Lưu
+            </button>
+            <a asp-controller="HangGPLX" asp-action="Index" class="btn btn-secondary">Hủy</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Kích hoạt validation client-side -->
+    <partial name="_ValidationScriptsPartial" />
+}

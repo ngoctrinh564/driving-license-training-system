@@ -1,0 +1,125 @@
+﻿@model List<dacn_gplx.Models.PhieuThanhToan>
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Quản lý phiếu thanh toán";
+}
+
+<style>
+    .badge-gray {
+        background-color: #9ca3af;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+    .badge-blue {
+        background-color: #3b82f6;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+    tr.row-click:hover {
+        background-color: #f0f9ff !important;
+        cursor: pointer;
+    }
+</style>
+
+<div class="card">
+
+    <!-- HEADER -->
+    <div class="card-header"> </div>
+
+    <!-- TABLE -->
+    <div class="card-body table-responsive p-0">
+        <table class="table table-hover table-bordered text-nowrap">
+            <thead class="thead-light">
+                <tr>
+                    <th>Tên phiếu</th>
+                    <th>Ngày lập</th>
+                    <th>Tổng tiền</th>
+                    <th>Ngày nộp</th>
+                    <th>Trạng thái</th>
+                    <th>Ảnh minh chứng</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            <i class="fas fa-folder-open fa-2x d-block mb-2"></i>
+                            Chưa có phiếu thanh toán
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    foreach (var p in Model)
+                    {
+                        string badgeClass = p.Trangthai switch
+                        {
+                            "Chưa Thanh Toán" => "badge-gray",
+                            "Chờ Xác Thực" => "badge-blue",
+                            "Đã Thanh Toán" => "badge-green",
+                            _ => "badge-secondary"
+                        };
+
+                        <tr class="row-click"
+                            onclick="location.href='@Url.Action("Details", "ThanhToan", new { id = p.PhieuId })'">
+
+                            <td>@p.Tenphieu</td>
+                            <td>@p.Ngaylap?.ToString("dd/MM/yyyy")</td>
+                            <td>@(p.Tongtien?.ToString("N0"))</td>
+                            <td>@p.Ngaynop?.ToString("dd/MM/yyyy")</td>
+
+                            <!-- Trạng thái -->
+                            <td onclick="event.stopPropagation();">
+                                <form asp-action="UpdateTrangThai"
+                                      asp-controller="ThanhToan"
+                                      method="post"
+                                      class="d-inline-flex align-items-center">
+                                    <input type="hidden" name="PhieuId" value="@p.PhieuId" />
+
+                                    <select name="Trangthai"
+                                            class="form-control form-control-sm"
+                                            onchange="this.form.submit()">
+                                        @{
+                                            string[] trangThais = { "Chưa Thanh Toán", "Chờ Xác Thực", "Đã Thanh Toán" };
+                                            foreach (var tt in trangThais)
+                                            {
+                                                <option value="@tt" selected="@(tt == p.Trangthai)">
+                                                    @tt
+                                                </option>
+                                            }
+                                        }
+                                    </select>
+                                </form>
+                            </td>
+
+                            <!-- Ảnh -->
+                            <td onclick="event.stopPropagation();">
+                                @if (!string.IsNullOrEmpty(p.AnhMinhChung))
+                                {
+                                    <img src="@p.AnhMinhChung"
+                                         style="max-width:70px; border:1px solid #ccc; cursor:pointer;"
+                                         data-toggle="modal"
+                                         data-target="#imageModal_@p.PhieuId" />
+                                }
+                                else
+                                {
+                                    <span class="text-muted"><i>Chưa có</i></span>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>

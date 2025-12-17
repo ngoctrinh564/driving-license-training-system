@@ -1,0 +1,196 @@
+﻿@model dacn_gplx.ViewModels.DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<section class="content">
+    <div class="container-fluid">
+
+        <!-- ================= KPI BOX ================= -->
+        <div class="row">
+
+            <div class="col-lg-3 col-6">
+                <a asp-controller="User" asp-action="Index" class="text-white">
+                    <div class="small-box bg-gradient-info">
+                        <div class="inner">
+                            <h3>@Model.TongHocVien</h3>
+                            <p>Học viên</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="small-box-footer">
+                            Xem chi tiết <i class="fas fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <a asp-controller="HoSo" asp-action="Index" class="text-white">
+                    <div class="small-box bg-gradient-primary">
+                        <div class="inner">
+                            <h3>@Model.TongHoSo</h3>
+                            <p>Hồ sơ</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-folder-open"></i>
+                        </div>
+                        <div class="small-box-footer">
+                            Xem chi tiết <i class="fas fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <a asp-controller="Exam" asp-action="Index" class="text-dark">
+                    <div class="small-box bg-gradient-warning">
+                        <div class="inner">
+                            <h3>@Model.KyThiSapToi</h3>
+                            <p>Kỳ thi sắp tới</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="small-box-footer">
+                            Xem chi tiết <i class="fas fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+            <div class="col-lg-3 col-6">
+                <a asp-controller="ThanhToan" asp-action="Index" class="text-white">
+                    <div class="small-box bg-gradient-success">
+                        <div class="inner">
+                            <h3>@Model.DoanhThuThang.ToString("N0") ₫</h3>
+                            <p>Doanh thu tháng</p>
+                        </div>
+                        <div class="icon">
+                            <i class="fas fa-coins"></i>
+                        </div>
+                        <div class="small-box-footer">
+                            Xem chi tiết <i class="fas fa-arrow-circle-right"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        </div>
+        <!-- ================= END KPI ================= -->
+        <!-- ================= CHART ================= -->
+        <div class="row">
+            <div class="col-12">
+                <div class="card card-outline card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-line"></i>
+                            Thống kê hồ sơ & doanh thu theo tháng
+                        </h3>
+                    </div>
+
+                    <div class="card-body" style="height:360px">
+                        <canvas id="chartDashboard"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ================= END CHART ================= -->
+
+    </div>
+</section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        const ctx = document.getElementById('chartDashboard');
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Thang)),
+                datasets: [
+                    {
+                        label: 'Hồ sơ',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SoHoSoTheoThang)),
+                        yAxisID: 'yHoSo',
+                        fill: true,
+                        tension: 0.4,
+                        backgroundColor: 'rgba(0,123,255,0.2)',
+                        borderColor: '#007bff',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: 'Doanh thu (VNĐ)',
+                        data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.DoanhThuTheoThang)),
+                        yAxisID: 'yDoanhThu',
+                        tension: 0.4,
+                        borderColor: '#20c997',
+                        backgroundColor: 'rgba(32,201,151,0.2)',
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false
+                },
+                animation: {
+                    duration: 1200,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                if (ctx.dataset.label.includes('Doanh thu')) {
+                                    return ctx.dataset.label + ': ' +
+                                        ctx.parsed.y.toLocaleString() + ' ₫';
+                                }
+                                return ctx.dataset.label + ': ' + ctx.parsed.y;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    yHoSo: {
+                        type: 'linear',
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Số hồ sơ'
+                        },
+                        ticks: {
+                            stepSize: 1
+                        }
+                    },
+                    yDoanhThu: {
+                        type: 'linear',
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Doanh thu (VNĐ)'
+                        },
+                        ticks: {
+                            callback: value => value.toLocaleString() + ' ₫'
+                        },
+                        grid: {
+                            drawOnChartArea: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

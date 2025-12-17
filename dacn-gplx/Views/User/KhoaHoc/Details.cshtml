@@ -1,0 +1,49 @@
+﻿@model dacn_gplx.Models.KhoaHoc
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    bool daDangKy = ViewBag.DaDangKy ?? false;
+    bool khoaHocHoanThanhCungHang = ViewBag.KhoaHocHoanThanhCungHang ?? false;
+}
+
+<section class="content-header mb-3">
+    <div class="container-fluid">
+        <h1>Chi tiết khóa học</h1>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+
+        <!-- Thông báo -->
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+        @if (TempData["Warning"] != null)
+        {
+            <div class="alert alert-warning">@TempData["Warning"]</div>
+        }
+
+        <div class="card shadow-sm mb-3">
+            <div class="card-header">
+                <h3 class="card-title">@Model.TenKhoaHoc</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Hạng:</strong> @Model.Hang?.Tenhang</p>
+                <p><strong>Ngày bắt đầu:</strong> @Model.Ngaybatdau?.ToString("dd/MM/yyyy")</p>
+                <p><strong>Ngày kết thúc:</strong> @Model.Ngayketthuc?.ToString("dd/MM/yyyy")</p>
+                <p><strong>Địa điểm:</strong> @Model.Diadiem</p>
+
+                <hr />               
+            </div>
+            <div class="card-footer text-center">
+                <a href="@Url.Action("Index", "DangKiKhoaHoc")" class="btn btn-secondary btn-sm mb-1">Quay lại</a>
+                @if (!daDangKy && !khoaHocHoanThanhCungHang)
+                {
+                    <a href="@Url.Action("DangKy", "DangKiKhoaHoc", new { id = Model.KhoahocId })" class="btn btn-primary btn-sm mb-1">Đăng ký</a>
+                }
+            </div>
+        </div>
+    </div>
+</section>

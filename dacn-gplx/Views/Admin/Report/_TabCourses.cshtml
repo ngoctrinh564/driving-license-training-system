@@ -1,0 +1,83 @@
+﻿@model dacn_gplx.ViewModels.Reports.DashboardReportVM
+@using System.Text.Json
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <strong>Khóa học mới theo thời gian</strong>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <span class="badge badge-secondary p-2">Tổng khóa học mới: @Model.SoKhoaHocMoi</span>
+                </div>
+                <canvas id="chart_courses_bar" height="140"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <strong>Phân bố khóa học theo hạng</strong>
+            </div>
+            <div class="card-body">
+                <canvas id="chart_courses_pie" height="140"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+@{
+    var jsonBar = JsonSerializer.Serialize(Model.NewCoursesByMonth);
+    var jsonPie = JsonSerializer.Serialize(Model.CoursesByHang);
+}
+<div id="__data_courses" data-bar='@Html.Raw(jsonBar)' data-pie='@Html.Raw(jsonPie)'></div>
+
+<script>
+    window.__renderTabCharts = function () {
+        destroyChart("courses_bar");
+        destroyChart("courses_pie");
+
+        const el = document.getElementById("__data_courses");
+        const barPoints = JSON.parse(el.getAttribute("data-bar"));
+        const pieSlices = JSON.parse(el.getAttribute("data-pie"));
+
+        // Bar
+        const labelsBar = barPoints.map(p => p.Label);
+        const valuesBar = barPoints.map(p => p.Value);
+
+        const ctxBar = document.getElementById("chart_courses_bar").getContext("2d");
+        window.__charts["courses_bar"] = new Chart(ctxBar, {
+            type: "bar",
+            data: {
+                labels: labelsBar,
+                datasets: [{
+                    label: "Khóa học mới",
+                    data: valuesBar
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Pie
+        const labelsPie = pieSlices.map(p => p.Label);
+        const valuesPie = pieSlices.map(p => p.Value);
+
+        const ctxPie = document.getElementById("chart_courses_pie").getContext("2d");
+        window.__charts["courses_pie"] = new Chart(ctxPie, {
+            type: "pie",
+            data: {
+                labels: labelsPie,
+                datasets: [{
+                    data: valuesPie
+                }]
+            },
+            options: { responsive: true }
+        });
+    }
+</script>

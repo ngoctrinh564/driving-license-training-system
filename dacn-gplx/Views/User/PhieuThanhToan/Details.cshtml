@@ -1,0 +1,182 @@
+﻿@model dacn_gplx.ViewModels.ChiTietPhieuVM
+
+<div class="container mt-4">
+
+    <h2 class="mb-4 text-primary">📄 Chi Tiết Phiếu Thanh Toán</h2>
+
+    <div class="row">
+
+        <!-- =========================
+             CỘT TRÁI – THÔNG TIN KHÓA HỌC
+        ========================== -->
+        <div class="col-md-7">
+            <div class="card shadow p-4">
+
+                <h4 class="text-primary mb-3">📘 Thông tin khóa học</h4>
+
+                @if (Model.TenKhoaHoc == null)
+                {
+                    <div class="alert alert-warning">
+                        Không tìm thấy khóa học liên quan.
+                    </div>
+                }
+                else
+                {
+                    <p><strong>Mã khóa học:</strong> @Model.KhoaHocId</p>
+                    <p><strong>Tên khóa học:</strong> @Model.TenKhoaHoc</p>
+                    <p><strong>Hạng GPLX:</strong> @Model.TenHang</p>
+                    <p><strong>Địa điểm học:</strong> @Model.DiaDiem</p>
+                    <p><strong>Ngày bắt đầu:</strong> @Model.NgayBatDau?.ToString("dd/MM/yyyy")</p>
+                    <p><strong>Ngày kết thúc:</strong> @Model.NgayKetThuc?.ToString("dd/MM/yyyy")</p>
+                }
+
+                <hr />
+
+                <h4 class="text-primary mt-4">📄 Thông tin thanh toán</h4>
+
+                <p><strong>Tên phiếu:</strong> @Model.Tenphieu</p>
+                <p><strong>Ngày lập:</strong> @Model.Ngaylap?.ToString("dd/MM/yyyy")</p>
+
+                <p>
+                    <strong>Tổng tiền:</strong>
+                    <span class="text-danger fw-bold">
+                        @(Model.Tongtien?.ToString("N0")) đ
+                    </span>
+                </p>
+
+                <p>
+                    <strong>Trạng thái:</strong>
+                    @if (Model.Trangthai?.Trim().Equals("Chưa Thanh Toán", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        <span class="badge bg-warning text-dark">Chưa thanh toán</span>
+                    }
+                    else if (Model.Trangthai?.Trim().Equals("Chờ Xác Thực", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        <span class="badge bg-info text-dark">Chờ xác thực</span>
+                    }
+                    else if (Model.Trangthai?.Trim().Equals("Đã Thanh Toán", StringComparison.OrdinalIgnoreCase) == true)
+                    {
+                        <span class="badge bg-success">
+                            Đã thanh toán ngày @Model.Ngaynop?.ToString("dd/MM/yyyy")
+                        </span>
+                    }
+                </p>
+
+                <!-- Form upload minh chứng -->
+                <h4 class="text-primary mt-4">📷 Ảnh thanh toán</h4>
+
+                <form asp-action="UploadMinhChung"
+                      method="post"
+                      enctype="multipart/form-data">
+
+                    <input type="hidden" name="PhieuId" value="@Model.PhieuId" />
+
+                    <div class="mb-3">
+                        <label class="form-label">Chọn ảnh minh chứng</label>
+                        <input type="file" name="MinhChungThanhToan" class="form-control" accept="image/*" required />
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Upload Minh Chứng</button>
+                </form>
+
+                <hr />
+
+                @if (!string.IsNullOrEmpty(Model.AnhMinhChung))
+                {
+                    <div class="mt-3">
+                        <p class="fw-bold">Ảnh minh chứng hiện tại:</p>
+                        <img src="@Model.AnhMinhChung" class="img-fluid rounded border" style="max-width: 350px;" />
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted"><i>Chưa có ảnh minh chứng</i></p>
+                }
+
+                <!-- Nút nằm ngay dưới thông tin thanh toán -->
+                <div class="mt-3">
+                    <a asp-action="Index" class="btn btn-secondary">
+                        ← Quay lại danh sách
+                    </a>
+
+                    @if (Model.Trangthai == "Chưa Thanh Toán")
+                    {
+                        <form id="formThanhToan" asp-action="ThanhToan" asp-controller="PhieuThanhToan"
+                              method="post" class="d-inline">
+                            <input type="hidden" name="id" value="@Model.PhieuId" />
+                            <button type="button" id="btnThanhToan" class="btn btn-success ms-2">
+                                💰 Xác nhận thanh toán
+                            </button>
+                        </form>
+                    }
+                </div>
+
+            </div>
+        </div>
+
+        <!-- =========================
+             CỘT PHẢI – QR + HƯỚNG DẪN
+        ========================== -->
+        <div class="col-md-5">
+            <div class="card shadow p-4 text-center">
+
+                <img src="/images/QR.jpg" class="img-fluid border rounded mb-3" />
+
+                <div class="alert alert-info text-start">
+                    <strong>Hướng dẫn thanh toán:</strong>
+                    <ul>
+                        <li>Mở App ngân hàng trên điện thoại.</li>
+                        <li>Chọn chức năng <strong>Quét mã QR</strong>.</li>
+                        <li>Quét mã QR hiển thị phía trên.</li>
+                        <li>Số tiền cần thanh toán: <strong>@Model.Tongtien?.ToString("N0") đ</strong></li>
+                        <li>Nội dung chuyển khoản: <strong>Mã Khóa Học_Họ Tên_Số điện thoại</strong></li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ============================
+     MODAL CẢNH BÁO CHƯA UP ẢNH
+============================ -->
+<div class="modal fade" id="modalCanhBao" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-warning">
+
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title text-dark">⚠️ Chưa có ảnh minh chứng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <p>Bạn chưa tải ảnh minh chứng thanh toán cho phiếu <strong>@Model.Tenphieu</strong>.</p>
+                <p>Vui lòng upload ảnh trước khi xác nhận thanh toán.</p>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-dismiss="modal">Đã hiểu</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById("btnThanhToan").addEventListener("click", function () {
+
+            const hasImage = '@(string.IsNullOrEmpty(Model.AnhMinhChung) ? "0" : "1")';
+
+            if (hasImage === "0") {
+                var modal = new bootstrap.Modal(document.getElementById('modalCanhBao'));
+                modal.show();
+            } else {
+                document.getElementById("formThanhToan").submit();
+            }
+        });
+    </script>
+}

@@ -1,0 +1,76 @@
+﻿@model dacn_gplx.Models.HangGplx
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Chi tiết hạng GPLX";
+}
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="card">
+
+            <!-- HEADER -->
+            <div class="card-header">
+                <h3 class="card-title">
+                    Chi tiết hạng GPLX: <strong>@Model.Tenhang</strong>
+                </h3>
+            </div>
+
+            <!-- BODY -->
+            <div class="card-body p-0">
+                <table class="table table-bordered mb-0">
+                    <tr>
+                        <th style="width: 250px;">Mã hạng GPLX</th>
+                        <td>@Model.HangId</td>
+                    </tr>
+                    <tr>
+                        <th>Tên hạng GPLX</th>
+                        <td>@Model.Tenhang</td>
+                    </tr>
+                    <tr>
+                        <th>Mô tả</th>
+                        <td>@Model.Mota</td>
+                    </tr>
+                    <tr>
+                        <th>Loại phương tiện</th>
+                        <td>@Model.Loaiphuongtien</td>
+                    </tr>
+                    <tr>
+                        <th>Thời hạn lý thuyết (giờ)</th>
+                        <td>@Model.Thoihanlythuyet</td>
+                    </tr>
+                    <tr>
+                        <th>Thời hạn thực hành (giờ)</th>
+                        <td>@Model.Thoihanthuchanh</td>
+                    </tr>
+                    <tr>
+                        <th>Học phí</th>
+                        <td>
+                            <strong>
+                                @String.Format("{0:N0} VNĐ", Model.Hocphi)
+                            </strong>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="card-footer text-right">
+                <a asp-controller="HangGPLX"
+                   asp-action="Index"
+                   class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+
+                <a asp-controller="HangGPLX"
+                   asp-action="Edit"
+                   asp-route-id="@Model.HangId"
+                   class="btn btn-warning ml-2">
+                    <i class="fas fa-edit"></i> Sửa
+                </a>
+            </div>
+
+        </div>
+    </div>
+</section>

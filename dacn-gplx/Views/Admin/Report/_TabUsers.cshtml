@@ -1,0 +1,50 @@
+﻿@model dacn_gplx.ViewModels.Reports.DashboardReportVM
+@using System.Text.Json
+
+<div class="card">
+    <div class="card-header">
+        <strong>Người dùng mới</strong>
+    </div>
+    <div class="card-body">
+        <div class="mb-2">
+            <span class="badge badge-info p-2">Tổng người mới: @Model.SoNguoiMoi</span>
+        </div>
+
+        <canvas id="chart_users_line" height="120"></canvas>
+    </div>
+</div>
+
+@{
+    var json = JsonSerializer.Serialize(Model.NewUsersByMonth);
+}
+<div id="__data_users" data-json='@Html.Raw(json)'></div>
+
+<script>
+    window.__renderTabCharts = function () {
+        destroyChart("users_line");
+
+        const raw = document.getElementById("__data_users").getAttribute("data-json");
+        const points = JSON.parse(raw);
+
+        const labels = points.map(p => p.Label);
+        const values = points.map(p => p.Value);
+
+        const ctx = document.getElementById("chart_users_line").getContext("2d");
+        window.__charts["users_line"] = new Chart(ctx, {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Người mới",
+                    data: values,
+                    tension: 0.35
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: true } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+</script>

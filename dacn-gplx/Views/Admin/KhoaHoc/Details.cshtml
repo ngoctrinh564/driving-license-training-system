@@ -1,0 +1,105 @@
+﻿@model dacn_gplx.Models.KhoaHoc
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";  
+
+    string badgeClass = Model.Trangthai switch
+    {
+        "Sắp khai giảng" => "badge badge-primary",
+        "Đang học" => "badge badge-warning",
+        "Đã kết thúc" => "badge badge-danger",
+        _ => "badge badge-secondary"
+    };
+}
+
+<style>
+    .section-header {
+        background: #1e6ffb;
+        color: white;
+        padding: 12px 18px;
+        border-radius: 5px 5px 0 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+        .section-header h4 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+</style>
+
+<div class="card shadow">
+
+    <!-- HEADER XANH -->
+    <div class="section-header">
+        <h4><i class="fas fa-book"></i> Chi tiết khóa học</h4>
+
+        @if (Model.Trangthai == "Sắp khai giảng" || Model.Trangthai == "Đang học")
+        {
+            <a asp-action="Edit" asp-route-id="@Model.KhoahocId" class="btn btn-warning text-white">
+                <i class="fas fa-edit"></i> Sửa khóa học
+            </a>
+        }
+        else
+        {
+            <span class="text-light" style="font-size:14px;">
+                (Khóa học đã kết thúc – không thể chỉnh sửa)
+            </span>
+        }
+    </div>
+
+    <div class="card-body p-0">
+        <table class="table table-bordered mb-0">
+
+            <tr>
+                <th style="width:200px;">ID</th>
+                <td>@Model.KhoahocId</td>
+            </tr>
+
+            <tr>
+                <th>Tên khóa học</th>
+                <td>@Model.TenKhoaHoc</td>
+            </tr>
+
+            <tr>
+                <th>Hạng GPLX</th>
+                <td>@Model.Hang?.Tenhang</td>
+            </tr>
+
+            <tr>
+                <th>Học phí</th>
+                <td>@(Model.Hang?.Hocphi?.ToString("N0") ?? "-")</td>
+            </tr>
+
+            <tr>
+                <th>Ngày bắt đầu</th>
+                <td>@Model.Ngaybatdau?.ToString("dd/MM/yyyy")</td>
+            </tr>
+
+            <tr>
+                <th>Ngày kết thúc</th>
+                <td>@Model.Ngayketthuc?.ToString("dd/MM/yyyy")</td>
+            </tr>
+
+            <tr>
+                <th>Địa điểm</th>
+                <td>@Model.Diadiem</td>
+            </tr>
+
+            <tr>
+                <th>Trạng thái</th>
+                <td>
+                    <span class="@badgeClass">@Model.Trangthai</span>
+                </td>
+            </tr>
+
+        </table>
+
+        <div class="p-3">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+</div>

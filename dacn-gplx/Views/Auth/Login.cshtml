@@ -1,0 +1,146 @@
+﻿@using dacn_gplx.ViewModels
+@model LoginViewModel
+
+<!-- Font Awesome để dùng icon -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<style>
+    body {
+        background: #e9f2ff; /* xanh nhạt dịu mắt */
+    }
+
+    .login-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 60px;
+    }
+
+    .login-box {
+        width: 420px;
+        padding: 35px 30px;
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        transition: 0.3s;
+    }
+
+        .login-box:hover {
+            transform: translateY(-2px);
+        }
+
+    .login-title {
+        text-align: center;
+        font-size: 26px;
+        font-weight: 800;
+        color: #0066ff;
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+    }
+
+    .password-wrapper {
+        position: relative;
+    }
+
+        .password-wrapper input {
+            padding-right: 42px; /* chừa icon */
+        }
+
+    .toggle-password {
+        position: absolute;
+        bottom: 8px; /* ↓ thấp hơn nữa */
+        right: 12px;
+        cursor: pointer;
+        color: #6c757d;
+        font-size: 18px;
+    }
+
+
+
+        .toggle-password:hover {
+            color: #0d6efd;
+        }
+
+    .btn-login {
+        background: linear-gradient(90deg, #007bff, #005ce6);
+        border: none;
+        font-weight: 600;
+    }
+
+        .btn-login:hover {
+            background: linear-gradient(90deg, #0069e6, #0049c9);
+        }
+
+    .link-custom {
+        color: #005ce6;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+        .link-custom:hover {
+            text-decoration: underline;
+        }
+</style>
+
+
+<div class="login-wrapper">
+    <div class="login-box">
+
+        <h2 class="login-title">Đăng Nhập</h2>
+
+        <!-- Hiển thị lỗi -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger mt-2">
+                @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@err.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <form method="post">
+
+            <div class="mb-3">
+                <label for="LoginId" class="form-label">Tài khoản</label>
+                <input asp-for="LoginId" class="form-control" placeholder="Nhập username hoặc email" />
+            </div>
+
+            <div class="mb-3 password-wrapper">
+                <label asp-for="Password" class="form-label">Mật khẩu</label>
+                <input asp-for="Password" id="passwordInput" type="password" class="form-control" placeholder="Nhập mật khẩu" />
+                <i class="fa-solid fa-eye toggle-password" onclick="togglePassword()"></i>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-login w-100 mt-2">
+                Đăng nhập
+            </button>
+
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="/Auth/ForgotPassword" class="link-custom">Quên mật khẩu?</a> |
+            <a href="/Auth/Register" class="link-custom">Đăng ký</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePassword() {
+        const input = document.getElementById("passwordInput");
+        const icon = document.querySelector(".toggle-password");
+
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.remove("fa-eye");
+            icon.classList.add("fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.remove("fa-eye-slash");
+            icon.classList.add("fa-eye");
+        }
+    }
+</script>

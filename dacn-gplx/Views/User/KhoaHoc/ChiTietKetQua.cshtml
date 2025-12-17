@@ -1,0 +1,86 @@
+﻿@model dacn_gplx.Models.ChiTietKetQuaHocTap
+
+<h2 class="mb-4">Chi Tiết Kết Quả Học Tập</h2>
+
+<div class="card shadow-sm p-4 mb-4">
+    <!-- Thông tin Học viên -->
+    <h4 class="mb-3">Thông tin Học viên</h4>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <p><strong>Học viên:</strong> @Model.KetQuaHocTap?.Hoso?.Hocvien?.Hoten</p>
+        </div>
+    </div>
+
+    <!-- Thông tin Khóa học -->
+    <h4 class="mb-3">Thông tin Khóa học</h4>
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <p><strong>Khóa học:</strong> @Model.Khoahoc?.TenKhoaHoc</p>
+        </div>
+        <div class="col-md-6">
+            <p><strong>Hạng bằng:</strong> @Model.Khoahoc?.Hang?.Tenhang</p>
+        </div>
+    </div>
+
+    <!-- Kết quả chi tiết -->
+    <h4 class="mb-3">Kết quả chi tiết</h4>
+    <div class="row text-center">
+        @foreach (var item in new[] {
+                new { Name = "Lý thuyết", Value = Model.LythuyetKq },
+                new { Name = "Sa hình", Value = Model.SahinhKq },
+                new { Name = "Đường trường", Value = Model.DuongtruongKq },
+                new { Name = "Mô phỏng", Value = Model.MophongKq }
+                })
+        {
+            <div class="col-md-3">
+                <div class="card bg-light p-3 mb-2">
+                    <strong>@item.Name</strong>
+                    <p class="mt-2 @(item.Value == true ? "text-success" : "text-danger")">
+                        @(item.Value == true ? "Hoàn Thành" : "Chưa Hoàn Thành")
+                    </p>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Thông tin tổng hợp -->
+    <h4 class="mt-4 mb-3">Thông tin tổng hợp</h4>
+    <div class="row">
+        <div class="col-md-4">
+            <p><strong>Số buổi học:</strong> @Model.KetQuaHocTap?.Sobuoihoc</p>
+        </div>
+        <div class="col-md-4">
+            <p><strong>Số buổi vắng:</strong> @Model.KetQuaHocTap?.Sobuoivang</p>
+        </div>
+        <div class="col-md-4">
+            <p>
+                <strong>Số km hoàn thành:</strong>
+                @if (string.IsNullOrEmpty(Model.KetQuaHocTap?.Sokmhoanthanh))
+                {
+                    <span class="text-danger">0</span>
+                }
+                else
+                {
+                    @Model.KetQuaHocTap.Sokmhoanthanh
+                }
+            </p>
+        </div>
+        <div class="col-12">
+            <p>
+                <strong>Nhận xét:</strong>
+                @if (string.IsNullOrEmpty(Model.KetQuaHocTap?.Nhanxet))
+                {
+                    <span class="text-danger">Chưa có nhận xét</span>
+                }
+                else
+                {
+                    @Model.KetQuaHocTap.Nhanxet
+                }
+            </p>
+        </div>
+    </div>
+
+    <a asp-controller="DangKiKhoaHoc" asp-action="KetQuaHocTap" class="btn btn-secondary mt-3">
+        Quay lại
+    </a>
+</div>

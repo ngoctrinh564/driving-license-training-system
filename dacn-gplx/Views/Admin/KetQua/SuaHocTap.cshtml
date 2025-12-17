@@ -1,0 +1,127 @@
+﻿@model dacn_gplx.Models.KetQuaHocTap
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Sửa kết quả học tập";
+
+    var chiTiet = ViewBag.ChiTietHocTap as List<dacn_gplx.Models.ChiTietKetQuaHocTap>;
+}
+
+<div class="card">
+    <form asp-action="SuaHocTap" method="post">
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger">
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@error.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="KetquahoctapId" />
+
+        <!-- ================= THÔNG TIN CHUNG ================= -->
+        <div class="card-body border-bottom">
+            <div class="mb-3">
+                <label class="form-label">Học viên</label>
+                <input class="form-control" value="@Model.Hoso?.Hocvien?.Hoten" readonly />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Hồ sơ</label>
+                <input class="form-control" value="@Model.Hoso?.Tenhoso" readonly />
+            </div>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Sobuoihoc" class="form-label">Số buổi học</label>
+                    <input asp-for="Sobuoihoc" type="number" class="form-control" />
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Sobuoivang" class="form-label">Số buổi vắng</label>
+                    <input asp-for="Sobuoivang" type="number" class="form-control" />
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Sokmhoanthanh" class="form-label">Tổng KM hoàn thành</label>
+                    <input asp-for="Sokmhoanthanh" type="number" class="form-control" />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Nhanxet" class="form-label">Nhận xét</label>
+                <textarea asp-for="Nhanxet" rows="3" class="form-control"></textarea>
+            </div>
+        </div>
+
+        <!-- ================= CHI TIẾT KẾT QUẢ ================= -->
+        <div class="card-body p-0">
+            <table class="table table-bordered table-striped text-center mb-0">
+                <thead class="table-primary">
+                    <tr>
+                        <th>Khóa học</th>
+                        <th>Lý thuyết</th>
+                        <th>Sa hình</th>
+                        <th>Đường trường</th>
+                        <th>Mô phỏng</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @for (int i = 0; i < chiTiet.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                @chiTiet[i].Khoahoc?.TenKhoaHoc
+                                <input type="hidden"
+                                       name="chiTietList[@i].KhoahocId"
+                                       value="@chiTiet[i].KhoahocId" />
+                            </td>
+
+                            <td>
+                                <select name="chiTietList[@i].LythuyetKq" class="form-select form-select-sm">
+                                    <option value="true" selected="@chiTiet[i].LythuyetKq">Hoàn thành</option>
+                                    <option value="false" selected="@(!chiTiet[i].LythuyetKq)">Chưa hoàn thành</option>
+                                </select>
+                            </td>
+
+                            <td>
+                                <select name="chiTietList[@i].SahinhKq" class="form-select form-select-sm">
+                                    <option value="true" selected="@chiTiet[i].SahinhKq">Hoàn thành</option>
+                                    <option value="false" selected="@(!chiTiet[i].SahinhKq)">Chưa hoàn thành</option>
+                                </select>
+                            </td>
+
+                            <td>
+                                <select name="chiTietList[@i].DuongtruongKq" class="form-select form-select-sm">
+                                    <option value="true" selected="@chiTiet[i].DuongtruongKq">Hoàn thành</option>
+                                    <option value="false" selected="@(!chiTiet[i].DuongtruongKq)">Chưa hoàn thành</option>
+                                </select>
+                            </td>
+
+                            <td>
+                                <select name="chiTietList[@i].MophongKq" class="form-select form-select-sm">
+                                    <option value="true" selected="@chiTiet[i].MophongKq">Hoàn thành</option>
+                                    <option value="false" selected="@(!chiTiet[i].MophongKq)">Chưa hoàn thành</option>
+                                </select>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ================= NÚT ================= -->
+        <div class="card-footer text-end">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Lưu thay đổi
+            </button>
+            <a asp-action="HocTap" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </form>
+</div>

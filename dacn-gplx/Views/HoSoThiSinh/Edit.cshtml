@@ -1,0 +1,136 @@
+﻿@model dacn_gplx.ViewModels.HoSoThiSinhViewModel
+
+@{
+    ViewData["Title"] = "Chỉnh sửa hồ sơ";
+}
+
+<h2 class="mb-4">Chỉnh sửa hồ sơ</h2>
+
+<form asp-action="Edit" method="post" enctype="multipart/form-data" class="border p-4 shadow-sm rounded">
+
+    <input type="hidden" asp-for="HosoId" />
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Hạng GPLX</label>
+        <select asp-for="HangId" class="form-select" required>
+            @foreach (var hang in ViewBag.HangGPLX)
+            {
+                <option value="@hang.HangId" selected="@(hang.HangId == Model.HangId)">
+                    @hang.Tenhang
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Ghi chú</label>
+        <textarea asp-for="Ghichu" class="form-control" rows="3"></textarea>
+    </div>
+
+    <hr />
+
+    <h4 class="fw-bold mt-3">Thông tin Giấy khám sức khỏe</h4>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Ngày ký / Ngày khám</label>
+        <input asp-for="Thoihan" type="date" class="form-control" id="ngayKyEdit" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Ngày hết hạn</label>
+        <input id="ngayHetHanEdit" class="form-control bg-light" readonly
+               value="@(Model.Thoihan.HasValue ? Model.Thoihan.Value.ToDateTime(TimeOnly.MinValue).AddMonths(12).ToString("yyyy-MM-dd") : "")" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Hiệu lực</label>
+        <input value="12 tháng" class="form-control bg-light" readonly />
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Mắt trái</label>
+            <input asp-for="KhamMatTrai" class="form-control" />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Mắt phải</label>
+            <input asp-for="KhamMatPhai" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Huyết áp</label>
+            <input asp-for="Huyetap" class="form-control" />
+        </div>
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Chiều cao (cm)</label>
+            <input asp-for="Chieucao" type="number" step="0.1" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label fw-bold">Cân nặng (kg)</label>
+            <input asp-for="Cannang" type="number" step="0.1" class="form-control" />
+        </div>
+    </div>
+
+    @if (Model.AnhGkskUrls != null && Model.AnhGkskUrls.Count > 0)
+    {
+        <h5 class="fw-bold mt-4">Ảnh giấy khám sức khỏe hiện tại:</h5>
+
+        <div class="row mt-2">
+            @for (int i = 0; i < Model.AnhGkskUrls.Count; i++)
+            {
+                <div class="col-md-3 mb-3">
+                    <div class="border p-2 rounded shadow-sm bg-light">
+
+                        <img src="@Model.AnhGkskUrls[i]" class="img-fluid rounded"
+                             style="width: 100%; height: 180px; object-fit: cover;" />
+
+                        <div class="form-check mt-2">
+                            <input class="form-check-input"
+                                   type="checkbox"
+                                   name="AnhGkskDeleteIds"
+                                   value="@Model.AnhGkskIds[i]" />
+                            <label class="form-check-label text-danger fw-bold">Xóa ảnh này</label>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <div class="mb-4">
+        <label class="form-label fw-bold mt-3">Thêm ảnh giấy khám sức khỏe</label>
+        <input asp-for="AnhGkskFiles" type="file" multiple class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+    <a href="/HoSoThiSinh" class="btn btn-secondary">Hủy</a>
+
+</form>
+
+<script>
+    const ngayKyInput = document.getElementById("ngayKyEdit");
+    const ngayHetHan = document.getElementById("ngayHetHanEdit");
+
+    ngayKyInput.addEventListener("change", () => {
+        if (!ngayKyInput.value) {
+            ngayHetHan.value = "";
+            return;
+        }
+
+        let date = new Date(ngayKyInput.value);
+        date.setMonth(date.getMonth() + 12);
+
+        let yyyy = date.getFullYear();
+        let mm = String(date.getMonth() + 1).padStart(2, '0');
+        let dd = String(date.getDate()).padStart(2, '0');
+
+        ngayHetHan.value = `${yyyy}-${mm}-${dd}`;
+    });
+</script>

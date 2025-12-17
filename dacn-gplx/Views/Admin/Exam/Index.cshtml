@@ -1,0 +1,112 @@
+﻿@model IEnumerable<dacn_gplx.Models.KyThi>
+
+@{
+    ViewData["Title"] = "Quản lý kỳ thi";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<section class="content">
+    <div class="container-fluid">
+
+        <!-- CARD -->
+        <div class="card">
+
+            <div class="card-header">
+                <div class="card-tools float-right d-flex align-items-center">
+
+                    <!-- SEARCH -->
+                    <form id="searchForm"
+                          asp-action="Index"
+                          method="get"
+                          class="input-group input-group-sm mr-2"
+                          style="width: 280px;">
+                        <input type="text"
+                               name="search"
+                               id="searchInput"
+                               class="form-control"
+                               placeholder="Tìm theo tên / loại kỳ thi..."
+                               value="@ViewBag.Search">
+                    </form>
+
+                    <!-- ADD BUTTON -->
+                    <a asp-action="Create" class="btn btn-success btn-sm">
+                        <i class="fas fa-plus"></i> Thêm kỳ thi
+                    </a>
+
+                </div>
+            </div>
+
+            <!-- TABLE -->
+            <div class="card-body table-responsive p-0">
+                <table class="table table-bordered table-hover mb-0 text-nowrap">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width:70px;" class="text-center">STT</th>
+                            <th style="width:40%;">Tên kỳ thi</th>
+                            <th style="width:180px;">Loại kỳ thi</th>
+                            <th style="width:200px;" class="text-center">Số lượng</th>
+                            <th style="width:200px;" class="text-center">Điều kiện</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @if (Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                var soDangKy = ViewData[$"SoDangKy_{item.KythiId}"] ?? 0;
+
+                                <tr onclick="window.location='@Url.Action("Details", "Exam", new { id = item.KythiId })'"
+                                    style="cursor:pointer">
+
+                                    <td class="text-center">@item.KythiId</td>
+                                    <td>@item.Tenkythi</td>
+                                    <td>@item.Loaikythi</td>
+                                    <td class="text-center">@soDangKy</td>
+                                    <td class="text-center">
+                                        @if (item.TrangThai == true)
+                                        {
+                                            <span class="badge badge-success">
+                                                <i class="fas fa-check-circle"></i> Đủ điều kiện
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-warning">
+                                                <i class="fas fa-exclamation-triangle"></i> Chưa đủ điều kiện
+                                            </span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5" class="text-center text-muted py-4">
+                                    Không có kỳ thi nào
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchForm = document.getElementById('searchForm');
+        let timer;
+
+        searchInput.addEventListener('input', function () {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                searchForm.submit();
+            }, 300);
+        });
+    </script>
+}

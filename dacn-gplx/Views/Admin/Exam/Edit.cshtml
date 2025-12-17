@@ -1,0 +1,62 @@
+﻿@model dacn_gplx.Models.KyThi
+
+@{
+    ViewData["Title"] = "Sửa Kì Thi";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-warning">
+            <div class="card-header">
+                <h3 class="card-title">Chỉnh Sửa Kì Thi</h3>
+            </div>
+
+            <form asp-action="Edit" method="post">
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <!-- Hidden ID -->
+                    <input type="hidden" asp-for="KythiId" />
+
+                    <!-- Tên kỳ thi -->
+                    <div class="form-group">
+                        <label asp-for="Tenkythi" class="control-label">Tên Kì Thi</label>
+                        <input asp-for="Tenkythi" class="form-control" />
+                        <span asp-validation-for="Tenkythi" class="text-danger"></span>
+                    </div>
+
+                    <!-- Loại kỳ thi -->
+                    <div class="form-group">
+                        <label asp-for="Loaikythi" class="control-label">Loại Kì Thi</label>
+                        <select asp-for="Loaikythi" class="form-control" asp-items="ViewBag.LoaiKyThiList">
+                            <option value="">-- Chọn loại kì thi --</option>
+                        </select>
+                        <span asp-validation-for="Loaikythi" class="text-danger"></span>
+                    </div>
+
+                    <!-- Trạng thái (readonly) -->
+                    <div class="form-group">
+                        <label asp-for="TrangThai" class="control-label">Trạng Thái</label>
+                        <input asp-for="TrangThai" class="form-control" readonly />
+                        <span asp-validation-for="TrangThai" class="text-danger"></span>
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fas fa-sync"></i> Cập nhật
+                    </button>
+                    <a asp-action="Index" class="btn btn-default float-right">Quay lại danh sách</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

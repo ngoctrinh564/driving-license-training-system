@@ -1,0 +1,157 @@
+﻿@model List<dacn_gplx.Models.Message>
+
+<style>
+    .chat-float {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 360px;
+        height: 520px;
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+        display: flex;
+        flex-direction: column;
+        z-index: 9999;
+    }
+
+    .chat-header {
+        background: #0d6efd;
+        color: white;
+        padding: 12px 15px;
+        font-weight: 600;
+        border-radius: 14px 14px 0 0;
+    }
+
+    .chat-body {
+        flex: 1;
+        padding: 10px;
+        overflow-y: auto;
+        background: #f8f9fa;
+    }
+
+    .bubble {
+        max-width: 75%;
+        padding: 8px 12px;
+        border-radius: 16px;
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .user {
+        background: #e7f2ff;
+        margin-left: auto;
+    }
+
+    .admin {
+        background: #e9ecef;
+        margin-right: auto;
+    }
+
+    .time {
+        font-size: 11px;
+        color: gray;
+        text-align: right;
+    }
+</style>
+
+<div class="chat-float" id="chatContainer">
+    <div class="chat-header">
+        💬 Hỗ trợ trực tuyến
+        <button id="minimizeChat"
+                style="float:right;
+                       border:none;
+                       background:transparent;
+                       color:white;
+                       font-size:18px;
+                       cursor:pointer;">
+            ─
+        </button>
+    </div>
+
+    <div class="chat-body" id="chatBox">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-muted text-center mt-3">
+                Chưa có tin nhắn 👋
+            </div>
+        }
+        else
+        {
+            foreach (var msg in Model)
+            {
+                bool isUser = msg.Sender == "User";
+                <div class="bubble @(isUser ? "user" : "admin")">
+                    @msg.Content
+                    <div class="time">
+                        @msg.Time.ToString("HH:mm dd/MM")
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    <div class="p-2 border-top d-flex">
+        <input id="messageInput"
+               class="form-control me-2"
+               placeholder="Nhập tin nhắn..." />
+        <button class="btn btn-primary" id="sendBtn">
+            Gửi
+        </button>
+    </div>
+</div>
+
+<script>
+    // =========================
+    // LOAD CHAT
+    // =========================
+    function loadChat() {
+        $("#chatBox").load("/Chat/Index #chatBox>*", function () {
+            scrollToBottom();
+        });
+    }
+
+    function scrollToBottom() {
+        const box = document.getElementById("chatBox");
+        if (box) box.scrollTop = box.scrollHeight;
+    }
+
+    // =========================
+    // GỬI TIN NHẮN
+    // =========================
+    function sendMessage() {
+        const content = $("#messageInput").val().trim();
+        if (!content) return;
+
+        $.post("/Chat/SendMessage", { content }, function (res) {
+            if (res.success) {
+                $("#messageInput").val("");
+                loadChat();
+            }
+        });
+    }
+
+    $("#sendBtn").click(sendMessage);
+
+    $("#messageInput").keypress(function (e) {
+        if (e.which === 13) {
+            sendMessage();
+            return false;
+        }
+    });
+
+    // =========================
+    // NÚT ─ (ẨN CHAT)
+    // GỌI NGƯỢC LÊN LAYOUT
+    // =========================
+    $("#minimizeChat").click(function () {
+        if (window.closeChat) {
+            window.closeChat(); // layout xử lý bong bóng
+        }
+    });
+
+    // =========================
+    // AUTO REFRESH CHAT
+    // =========================
+    setInterval(loadChat, 4000);
+</script>

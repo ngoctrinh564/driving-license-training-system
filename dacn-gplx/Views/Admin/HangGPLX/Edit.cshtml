@@ -1,0 +1,67 @@
+﻿@model dacn_gplx.Models.HangGplx
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Sửa Hạng GPLX";
+}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Sửa Hạng GPLX: @Model.Tenhang</h3>
+    </div>
+
+    <div class="card-body">
+        <form asp-controller="HangGPLX" asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="HangId" />
+
+            <!-- Tenhang (không sửa được) -->
+            <div class="form-group">
+                <label>Tên Hạng</label>
+                <input asp-for="Tenhang" class="form-control" disabled />
+                <input type="hidden" asp-for="Tenhang" />
+            </div>
+
+            <!-- Mota -->
+            <div class="form-group">
+                <label>Mô tả</label>
+                <input asp-for="Mota" class="form-control" />
+                <span asp-validation-for="Mota" class="text-danger"></span>
+            </div>
+
+            <!-- Loaiphuongtien -->
+            <div class="form-group">
+                <label>Loại phương tiện</label>
+                <input asp-for="Loaiphuongtien" class="form-control" />
+                <span asp-validation-for="Loaiphuongtien" class="text-danger"></span>
+            </div>
+
+            <!-- Thoihanlythuyet -->
+            <div class="form-group">
+                <label>Thời hạn lý thuyết (giờ)</label>
+                <input asp-for="Thoihanlythuyet" class="form-control" />
+            </div>
+
+            <!-- Thoihanthuchanh -->
+            <div class="form-group">
+                <label>Thời hạn thực hành (giờ)</label>
+                <input asp-for="Thoihanthuchanh" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label>Học Phí</label>
+                <input asp-for="Hocphi" class="form-control" />
+                <span asp-validation-for="Hocphi" class="text-danger"></span>
+            </div>
+
+            <!-- Buttons -->
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Lưu thay đổi
+            </button>
+            <a asp-controller="HangGPLX" asp-action="Index" class="btn btn-secondary">Hủy</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

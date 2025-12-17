@@ -1,0 +1,248 @@
+﻿@using Microsoft.AspNetCore.Http
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - Admin Panel</title>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+
+    <!-- Ionicons -->
+    <link rel="stylesheet"
+          href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css" />
+
+    <!-- AdminLTE -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css" />
+
+    @RenderSection("Styles", required: false)
+</head>
+
+<body class="hold-transition sidebar-mini layout-fixed">
+
+    <div class="wrapper">
+
+        <!-- ================= NAVBAR ================= -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+
+            <!-- Left -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#">
+                        <i class="fas fa-bars"></i>
+                    </a>
+                </li>
+
+                <li class="nav-item d-none d-sm-inline-block">
+                    <a href="/" class="nav-link">Home</a>
+                </li>
+            </ul>
+
+            <!-- Right -->
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="/Auth/Logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <!-- =============== END NAVBAR =============== -->
+        <!-- ================= SIDEBAR ================= -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+
+            <!-- Brand -->
+            <a href="/Admin" class="brand-link text-center">
+                <span class="brand-text font-weight-light">ADMIN GPLX</span>
+            </a>
+
+            <div class="sidebar">
+
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column"
+                        data-widget="treeview"
+                        role="menu"
+                        data-accordion="false">
+
+                        <!-- Dashboard -->
+                        <li class="nav-item">
+                            <a asp-area="Admin"
+                               asp-controller="Admin"
+                               asp-action="Index"
+                               class="nav-link">
+                                <i class="nav-icon fas fa-tachometer-alt"></i>
+                                <p>Dashboard</p>
+                            </a>
+                        </li>
+
+                        <!-- Người dùng -->
+                        <li class="nav-item">
+                            <a asp-controller="User" asp-action="Index" class="nav-link">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>Người dùng</p>
+                            </a>
+                        </li>
+
+                        <!-- Hồ sơ -->
+                        <li class="nav-item">
+                            <a asp-controller="HoSo" asp-action="Index" class="nav-link">
+                                <i class="nav-icon fas fa-folder-open"></i>
+                                <p>Hồ sơ thí sinh</p>
+                            </a>
+                        </li>
+
+                        <!-- Kỳ thi -->
+                        <li class="nav-item">
+                            <a asp-controller="Exam" asp-action="Index" class="nav-link">
+                                <i class="nav-icon fas fa-book"></i>
+                                <p>Kỳ thi</p>
+                            </a>
+                        </li>
+
+                        <!-- Hạng GPLX -->
+                        <li class="nav-item">
+                            <a asp-controller="HangGPLX" asp-action="Index" class="nav-link">
+                                <i class="nav-icon fas fa-id-card"></i>
+                                <p>Hạng GPLX</p>
+                            </a>
+                        </li>
+
+                        <!-- Khóa học -->
+                        <li class="nav-item">
+                            <a asp-controller="KhoaHoc" asp-action="Index" class="nav-link">
+                                <i class="nav-icon fas fa-chalkboard-teacher"></i>
+                                <p>Khóa học</p>
+                            </a>
+                        </li>
+
+                        <!-- Kết quả học tập -->
+                        <li class="nav-item">
+                            <a asp-controller="KetQua" asp-action="HocTap" class="nav-link">
+                                <i class="nav-icon fas fa-graduation-cap"></i>
+                                <p>Kết quả học tập</p>
+                            </a>
+                        </li>
+
+                        <!-- Kết quả thi -->
+                        <li class="nav-item">
+                            <a asp-controller="KetQua" asp-action="Thi" class="nav-link">
+                                <i class="nav-icon fas fa-file-alt"></i>
+                                <p>Kết quả thi</p>
+                            </a>
+                        </li>
+
+                        <!-- Thanh toán -->
+                        <li class="nav-item">
+                            <a asp-controller="ThanhToan" asp-action="Index" class="nav-link">
+                                <i class="nav-icon fas fa-receipt"></i>
+                                <p>Hóa đơn thanh toán</p>
+                            </a>
+                        </li>
+
+                        <!-- ================= REPORT ================= -->
+                        <li class="nav-item">
+                            <a asp-controller="Report" asp-action="Index" class="nav-link">
+                                <i class="nav-icon fas fa-chart-bar"></i>
+                                <p>Báo cáo - Thống kê</p>
+                            </a>
+                        </li>
+
+                    </ul>
+                </nav>
+            </div>
+        </aside>
+        <!-- =============== END SIDEBAR =============== -->
+        <!-- ================= CONTENT ================= -->
+        <div class="content-wrapper">
+
+            <section class="content-header">
+                <div class="container-fluid">
+                    <h1>@ViewData["Title"]</h1>
+                </div>
+            </section>
+
+            <section class="content">
+                @RenderBody()
+            </section>
+        </div>
+        <!-- =============== END CONTENT =============== -->
+        <!-- ================= FOOTER ================= -->
+        <footer class="main-footer text-center">
+            <strong>AdminLTE 3 Panel &copy; 2025</strong>
+        </footer>
+
+    </div>
+
+    <!-- ================= SCRIPTS ================= -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
+    @RenderSection("Scripts", required: false)
+
+    <!-- ================= ADMIN CHAT BUBBLE ================= -->
+    @if (User.Identity != null
+    && User.Identity.IsAuthenticated
+    && User.FindFirst("RoleName")?.Value == "Admin"
+    && !Context.Request.Path.Value.Contains("/Chat/AdminChat"))
+    {
+        <a asp-controller="Chat"
+           asp-action="AdminChat"
+           id="adminChatBubble"
+           title="Quản lý chat"
+           style="
+       position: fixed;
+       bottom: 20px;
+       right: 20px;
+       width: 55px;
+       height: 55px;
+       background: #0d6efd;
+       color: white;
+       border-radius: 50%;
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       font-size: 24px;
+       z-index: 9999;
+       text-decoration: none;">
+            💬
+            <span id="adminChatUnread"
+                  style="
+              display:none;
+              position:absolute;
+              top:-5px;
+              right:-5px;
+              background:red;
+              color:white;
+              font-size:12px;
+              min-width:20px;
+              height:20px;
+              border-radius:50%;
+              display:flex;
+              align-items:center;
+              justify-content:center;">
+            </span>
+        </a>
+
+        <script>
+            $(function () {
+                function loadUnread() {
+                    $.get("/Chat/GetAdminUnreadCount", function (count) {
+                        if (count > 0) {
+                            $("#adminChatUnread").text(count).show();
+                        } else {
+                            $("#adminChatUnread").hide();
+                        }
+                    });
+                }
+                loadUnread();
+                setInterval(loadUnread, 5000);
+            });
+        </script>
+    }
+
+</body>
+</html>

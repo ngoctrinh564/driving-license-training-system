@@ -1,0 +1,155 @@
+﻿@model IEnumerable<dacn_gplx.Models.KyThi>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var currentHosoIds = ViewBag.HosoIds as List<int> ?? new List<int>();
+}
+
+<style>
+    .exam-card {
+        border-radius: 15px !important;
+        overflow: hidden;
+        transition: 0.3s;
+        border: none;
+    }
+
+        .exam-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
+        }
+
+    .exam-header {
+        background: linear-gradient(135deg, #007bff, #00b4ff);
+        color: white;
+        padding: 20px;
+    }
+
+    .exam-title {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 3px;
+    }
+
+    .exam-type {
+        opacity: 0.9;
+        font-size: 14px;
+    }
+
+    .exam-body {
+        padding: 18px;
+        background: #ffffff;
+    }
+
+    .exam-footer {
+        background: #f8f9fa;
+        padding: 12px 18px;
+        text-align: right;
+        border-top: 1px solid #eaeaea;
+    }
+
+    .status-good {
+        color: #28a745;
+        font-weight: 600;
+    }
+
+    .status-bad {
+        color: #dc3545;
+        font-weight: 600;
+    }
+
+    .info-label {
+        font-weight: 600;
+    }
+
+    .badge-register {
+        font-size: 14px;
+        padding: 5px 10px;
+    }
+</style>
+
+<section class="content-header">
+    <div class="container-fluid">
+        <h1 class="mb-3">@ViewData["Title"]</h1>
+    </div>
+</section>
+@if (TempData["KiThiWarning"] != null)
+{
+    <div class="alert alert-warning">
+        @TempData["KiThiWarning"]
+    </div>
+}
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            @if (Model.Any())
+            {
+                @foreach (var exam in Model)
+                {
+                    var totalRegistered = ViewData[$"SoDangKy_{exam.KythiId}"] as int? ?? 0;
+
+                    var statusText = (totalRegistered >= 30) ? "Đủ điều kiện" : "Chưa đủ điều kiện";
+                    var statusCss = (totalRegistered >= 30) ? "status-good" : "status-bad";
+
+                    var nextSchedule = exam.LichThis
+                    .Where(l => l.Thoigianthi > DateTime.Now)
+                    .OrderBy(l => l.Thoigianthi)
+                    .FirstOrDefault();
+
+                    <div class="col-md-4 mb-4">
+                        <div class="card exam-card shadow">
+                            <div class="exam-header">
+                                <div class="exam-title">@exam.Tenkythi</div>
+                                <div class="exam-type">@exam.Loaikythi</div>
+                            </div>
+
+                            <div class="exam-body">
+                                <p>
+                                    <span class="info-label">Số học viên đăng ký:</span>
+                                    @totalRegistered
+                                </p>
+
+                                <p>
+                                    <span class="info-label">Lịch thi sắp tới:</span><br />
+                                    @if (nextSchedule != null)
+                                    {
+                                        <span class="text-primary">
+                                            @nextSchedule.Thoigianthi?.ToString("dd/MM/yyyy HH:mm")
+                                            • @nextSchedule.Diadiem
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa có lịch thi phù hợp</span>
+                                    }
+                                </p>
+                            </div>
+
+                            <div class="exam-footer">
+                                <a asp-action="Details" asp-route-id="@exam.KythiId" class="btn btn-info btn-sm">
+                                    Xem chi tiết
+                                </a>
+
+                                @if (currentHosoIds.Any() && !exam.ChiTietDangKyThis.Any(c => currentHosoIds.Contains(c.HosoId)))
+                                {
+                                    <form asp-action="Register" asp-route-id="@exam.KythiId" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-primary btn-sm">Đăng ký</button>
+                                    </form>
+                                }
+                                else if (currentHosoIds.Any())
+                                {
+                                    <span class="badge bg-success badge-register">Đã đăng ký</span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="alert alert-warning">
+                    Bạn chưa có khóa học nào được thanh toán. Vui lòng hoàn tất thanh toán để xem và đăng ký kỳ thi tương ứng.
+                </div>
+            }
+        </div>
+    </div>
+</section>

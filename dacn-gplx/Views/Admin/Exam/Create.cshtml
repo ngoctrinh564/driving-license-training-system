@@ -1,0 +1,69 @@
+﻿@model dacn_gplx.Models.KyThi
+
+@{
+    ViewData["Title"] = "Thêm Kỳ Thi Mới";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-primary">
+            <div class="card-header">
+                <h3 class="card-title">Nhập Thông Tin Kỳ Thi</h3>
+            </div>
+
+            <form asp-action="Create" method="post">
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <!-- Tên kỳ thi -->
+                    <div class="form-group">
+                        <label asp-for="Tenkythi" class="control-label">Tên Kỳ Thi</label>
+                        <input asp-for="Tenkythi" class="form-control"
+                               placeholder="Ví dụ: Kỳ thi sát hạch" />
+                        <span asp-validation-for="Tenkythi" class="text-danger"></span>
+                    </div>
+
+                    <!-- Hạng GPLX -->
+                    <div class="form-group">
+                        <label class="control-label">Hạng GPLX</label>
+                        <select name="HangGplx" class="form-control" required>
+                            <option value="">-- Chọn hạng GPLX --</option>
+                            @foreach (var h in ViewBag.HangGplxList)
+                            {
+                                <option value="@h.Tenhang">@h.Tenhang</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Loại kỳ thi -->
+                    <div class="form-group">
+                        <label asp-for="Loaikythi" class="control-label">Loại Kỳ Thi</label>
+                        <select asp-for="Loaikythi" class="form-control" asp-items="ViewBag.LoaiKyThiList">
+                            <option value="">-- Chọn loại kỳ thi --</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu Kỳ Thi
+                    </button>
+                    <a asp-action="Index" class="btn btn-default float-right">Hủy bỏ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

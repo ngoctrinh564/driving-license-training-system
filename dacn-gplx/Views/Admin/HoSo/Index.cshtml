@@ -1,0 +1,132 @@
+﻿@model List<dacn_gplx.ViewModels.HoSoIndexViewModel>
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Danh sách hồ sơ thí sinh";
+}
+
+<style>
+    tr.row-clickable:hover {
+        background-color: #f0f8ff !important;
+        cursor: pointer;
+    }
+
+    .badge-blue {
+        background-color: #3b82f6;
+        color: white;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+</style>
+
+<div class="card">
+    <div class="card-header">
+
+        <!-- FILTER SEARCH BAR -->
+        <div class="card-tools">
+            <form method="get" class="input-group input-group-sm" style="width: 520px;">
+
+                <!-- CCCD -->
+                <input type="text" name="cccd" class="form-control mr-2" placeholder="Lọc theo CCCD..."
+                       value="@ViewBag.CCCD" style="height:34px;" />
+
+                <!-- Tên học viên -->
+                <input type="text" name="ten" class="form-control mr-2" placeholder="Lọc theo tên học viên..."
+                       value="@ViewBag.Ten" style="height:34px;" />
+
+                <!-- Hạng GPLX -->
+                <select name="hang" class="form-control mr-2" style="height:34px;">
+                    <option value="">Hạng GPLX</option>
+                    <option value="A">A</option>
+                    <option value="A1">A1</option>
+                    <option value="B1">B1</option>
+                    <option value="B2">B2</option>
+                </select>
+
+                <!-- Trạng thái -->
+                <select name="trangthai" class="form-control mr-2" style="height:34px;">
+                    <option value="">Trạng thái</option>
+                    <option value="Đang xử lý">Đang xử lý</option>
+                    <option value="Đã duyệt">Đã duyệt</option>
+                    <option value="Từ chối">Từ chối</option>
+                </select>
+
+                <div class="input-group-append">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <a href="/HoSo" class="btn btn-secondary ml-1">
+                        <i class="fas fa-redo"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="card-body table-responsive p-0">
+        <table class="table table-hover table-bordered text-nowrap">
+            <thead class="thead-light">
+                <tr>
+                    <th style="width:50px;">STT</th>
+                    <th>Tên học viên</th>
+                    <th>CCCD</th>
+                    <th>Tên hồ sơ</th>
+                    <th>Hạng</th>
+                    <th>Ngày đăng ký</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="fas fa-folder-open fa-2x d-block mb-2"></i>
+                            Không tìm thấy hồ sơ nào
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    int stt = 1;
+                    foreach (var item in Model)
+                    {
+                        <tr class="row-clickable" onclick="window.location='/HoSo/Details/@item.HosoId'">
+                            <td>@stt</td>
+                            <td>@item.HoTen</td>
+                            <td>@item.SoCmndCccd</td>
+                            <td>@item.TenHoSo</td>
+
+                            <td>
+                                <span class="badge badge-secondary">@item.TenHang</span>
+                            </td>
+
+                            <td>@item.NgayDangKy?.ToString("dd/MM/yyyy")</td>
+
+                            <td>
+                                @if (item.TrangThai == "Đã duyệt")
+                                {
+                                    <span class="badge badge-success">Đã duyệt</span>
+                                }
+                                else if (item.TrangThai == "Từ chối")
+                                {
+                                    <span class="badge badge-danger">Từ chối</span>
+                                }
+                                else
+                                {
+                                    <span class="badge badge-info">Đang xử lý</span>
+                                }
+                            </td>
+                        </tr>
+
+                        stt++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

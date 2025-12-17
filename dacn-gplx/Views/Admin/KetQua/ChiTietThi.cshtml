@@ -1,0 +1,94 @@
+﻿@model dacn_gplx.Models.ChiTietKetQuaThi
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Chi tiết kết quả thi";
+}
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="card">
+
+            <!-- HEADER -->
+            <div class="card-header">
+                <h3 class="card-title">
+                    <i class="fas fa-file-alt mr-1"></i>
+                    Chi tiết kết quả thi
+                </h3>
+            </div>
+
+            <!-- BODY -->
+            <div class="card-body">
+
+                <!-- ROW 1 -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Học viên:</strong>
+                        <div>@Model.Hoso?.Hocvien?.Hoten</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>Hồ sơ:</strong>
+                        <div>@Model.Hoso?.Tenhoso</div>
+                    </div>
+                </div>
+
+                <!-- ROW 2 -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Bài thi:</strong>
+                        <div>@Model.Baithi?.Tenbaithi</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>Kỳ thi:</strong>
+                        <div>@Model.Baithi?.Kythi?.Tenkythi</div>
+                    </div>
+                </div>
+
+                <hr />
+
+                <!-- ROW 3 -->
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Tổng điểm:</strong>
+                        <div>
+                            <span class="h5 font-weight-bold">
+                                @(Model.TongDiem?.ToString("0.00") ?? "-")
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <strong>Kết quả:</strong>
+                        <div>
+                            @if (Model.KetQuaDatDuoc == "Đạt")
+                            {
+                                <span class="badge badge-success px-3 py-2">Đạt</span>
+                            }
+                            else if (Model.KetQuaDatDuoc == "Không đạt")
+                            {
+                                <span class="badge badge-danger px-3 py-2">Không đạt</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-secondary px-3 py-2">Chưa có</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FOOTER -->
+            <div class="card-footer text-left">
+                <a asp-action="Thi" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+</section>

@@ -1,0 +1,117 @@
+﻿@model dacn_gplx.ViewModels.Reports.DashboardReportVM
+@using System.Text.Json
+
+<div class="row">
+    <div class="col-md-3">
+        <div class="small-box bg-primary">
+            <div class="inner">
+                <h4>@Model.TongDoanhThu.ToString("N0")</h4>
+                <p>Tổng doanh thu (VNĐ)</p>
+            </div>
+            <div class="icon"><i class="fas fa-coins"></i></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h4>@Model.SoThangCoDoanhThu</h4>
+                <p>Số tháng có doanh thu</p>
+            </div>
+            <div class="icon"><i class="fas fa-calendar-alt"></i></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h4>@Model.SoHangGplx</h4>
+                <p>Số hạng GPLX</p>
+            </div>
+            <div class="icon"><i class="fas fa-id-card"></i></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h4>@Model.DoanhThuTrungBinhThang.ToString("N0")</h4>
+                <p>Doanh thu TB / tháng</p>
+            </div>
+            <div class="icon"><i class="fas fa-chart-line"></i></div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="info-box bg-info">
+            <span class="info-box-icon"><i class="fas fa-user-plus"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Người mới</span>
+                <span class="info-box-number">@Model.SoNguoiMoi</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="info-box bg-secondary">
+            <span class="info-box-icon"><i class="fas fa-book"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Khóa học mới</span>
+                <span class="info-box-number">@Model.SoKhoaHocMoi</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="info-box bg-teal">
+            <span class="info-box-icon"><i class="fas fa-clipboard-list"></i></span>
+            <div class="info-box-content">
+                <span class="info-box-text">Kỳ thi mới</span>
+                <span class="info-box-number">@Model.SoKyThiMoi</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-2">
+    <div class="card-header">
+        <strong>Doanh thu theo thời gian</strong>
+    </div>
+    <div class="card-body">
+        <canvas id="chart_overview_revenue" height="120"></canvas>
+    </div>
+</div>
+
+@{
+    var json = JsonSerializer.Serialize(Model.RevenueByMonth);
+}
+<div id="__data_overview" data-json='@Html.Raw(json)'></div>
+
+<script>
+    window.__renderTabCharts = function () {
+        // destroy chart cũ
+        destroyChart("overview_revenue");
+
+        const raw = document.getElementById("__data_overview").getAttribute("data-json");
+        const points = JSON.parse(raw);
+
+        const labels = points.map(p => p.Label);
+        const values = points.map(p => p.Value);
+
+        const ctx = document.getElementById("chart_overview_revenue").getContext("2d");
+        window.__charts["overview_revenue"] = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: "Doanh thu (VNĐ)",
+                    data: values
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+</script>

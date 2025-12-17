@@ -1,0 +1,73 @@
+﻿@model List<dacn_gplx.Models.ChiTietKetQuaHocTap>
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Chi tiết kết quả học tập";
+    var kq = ViewBag.KetQua as dacn_gplx.Models.KetQuaHocTap;
+}
+
+<div class="card">
+
+    <!-- ================= HEADER ================= -->
+    <div class="card-header d-flex align-items-center">
+        <h5 class="mb-0 flex-grow-1"></h5>
+
+        <!-- NÚT SỬA – GÓC PHẢI -->
+        <a asp-action="SuaHocTap"
+           asp-route-id="@kq?.KetquahoctapId"
+           class="btn btn-warning btn-sm shadow-sm">
+            <i class="fas fa-edit me-1"></i> Sửa
+        </a>
+    </div>
+
+    <!-- ================= THÔNG TIN CHUNG ================= -->
+    <div class="p-3 border-bottom">
+        <div class="row">
+            <div class="col-md-6">
+                <p><strong>Học viên:</strong> @kq?.Hoso?.Hocvien?.Hoten</p>
+                <p><strong>Hồ sơ:</strong> @kq?.Hoso?.Tenhoso</p>
+                <p><strong>Số buổi học:</strong> @kq?.Sobuoihoc</p>
+            </div>
+            <div class="col-md-6">
+                <p><strong>Số buổi vắng:</strong> @kq?.Sobuoivang</p>
+                <p><strong>Số KM hoàn thành:</strong> @kq?.Sokmhoanthanh</p>
+                <p><strong>Nhận xét:</strong> @kq?.Nhanxet</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= BẢNG CHI TIẾT (CHỈ XEM) ================= -->
+    <div class="card-body table-responsive p-0">
+        <table class="table table-bordered table-striped text-center mb-0">
+            <thead class="table-primary">
+                <tr>
+                    <th>Khóa học</th>
+                    <th>Lý thuyết</th>
+                    <th>Sa hình</th>
+                    <th>Đường trường</th>
+                    <th>Mô phỏng</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Khoahoc?.TenKhoaHoc</td>
+                        <td>@(item.LythuyetKq == true ? "Hoàn thành" : "Chưa hoàn thành")</td>
+                        <td>@(item.SahinhKq == true ? "Hoàn thành" : "Chưa hoàn thành")</td>
+                        <td>@(item.DuongtruongKq == true ? "Hoàn thành" : "Chưa hoàn thành")</td>
+                        <td>@(item.MophongKq == true ? "Hoàn thành" : "Chưa hoàn thành")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <div class="card-footer text-end">
+        <a asp-action="HocTap" class="btn btn-secondary btn-sm">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+    </div>
+
+</div>

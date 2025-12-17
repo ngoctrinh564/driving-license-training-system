@@ -1,0 +1,98 @@
+﻿@model dacn_gplx.Models.PhieuThanhToan
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+}
+
+<h2>Chi tiết phiếu thanh toán</h2>
+
+<div class="card p-3 mb-3">
+    <p><strong>Mã phiếu:</strong> @Model.PhieuId</p>
+    <p><strong>Tên phiếu:</strong> @Model.Tenphieu</p>
+    <p><strong>Ngày lập:</strong> @Model.Ngaylap?.ToString("dd/MM/yyyy")</p>
+    <p><strong>Tổng tiền:</strong> @Model.Tongtien?.ToString("N0")</p>
+    <p><strong>Ngày nộp:</strong> @Model.Ngaynop?.ToString("dd/MM/yyyy")</p>
+
+    <p>
+        <strong>Trạng thái:</strong>
+        @if (!string.IsNullOrEmpty(Model.Trangthai))
+        {
+            <span class="badge
+                    @(Model.Trangthai == "Chưa Thanh Toán" ? "bg-warning text-dark" :
+                                    Model.Trangthai == "Chờ Xác Nhận" ? "bg-info text-dark" :
+                                    Model.Trangthai == "Đã Xác Nhận" ? "bg-success" : "bg-secondary")">
+            @Model.Trangthai
+        </span>
+                }
+    </p>
+
+    <p>
+        <strong>Ảnh minh chứng:</strong>
+        @if (!string.IsNullOrEmpty(Model.AnhMinhChung))
+        {
+            <!-- Ảnh nhỏ hiển thị -->
+            <img src="@Model.AnhMinhChung" style="max-width:200px; border:1px solid #ccc; cursor:pointer;"
+                 data-toggle="modal" data-target="#imageModal" />
+        }
+        else
+        {
+            <span><i>Chưa có ảnh</i></span>
+        }
+    </p>
+</div>
+
+<!-- Modal Bootstrap 4 hiển thị ảnh to -->
+@if (!string.IsNullOrEmpty(Model.AnhMinhChung))
+{
+    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ảnh minh chứng</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Đóng">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <!-- thêm p-2 cho đẹp, và giới hạn chiều cao -->
+                <div class="modal-body text-center p-2">
+                    <img src="@Model.AnhMinhChung"
+                         style="
+                            max-width:100%;
+                            max-height:80vh;
+                            width:auto;
+                            height:auto;
+                            object-fit:contain;
+                            display:block;
+                            margin:auto;
+                             " />
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<h4>Danh sách chi tiết phiếu</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Hồ sơ ID</th>
+            <th>Tên hồ sơ</th>
+            <th>Loại phí</th>
+            <th>Ghi chú</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ct in Model.ChiTietPhieuThanhToans)
+        {
+            <tr>
+                <td>@ct.HosoId</td>
+                <td>@ct.Hoso?.Tenhoso</td>
+                <td>@ct.Loaiphi</td>
+                <td>@ct.Ghichu</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a href="@Url.Action("Index", "ThanhToan")" class="btn btn-secondary mt-3">Quay lại</a>

@@ -1,0 +1,98 @@
+﻿@model List<dacn_gplx.Models.User>
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Quản lý người dùng";
+}
+
+<section class="content">
+        <!-- CARD -->
+        <div class="card">
+
+            <!-- CARD HEADER -->
+        <div class="card-header">
+            <div class="card-tools ml-auto d-flex align-items-center gap-2">
+
+                <!-- SEARCH -->
+                <form id="searchForm"
+                      method="get"
+                      asp-controller="User"
+                      asp-action="Index"
+                      class="input-group input-group-sm"
+                      style="width: 220px;">
+                    <input type="text"
+                           name="search"
+                           id="searchInput"
+                           class="form-control"
+                           placeholder="Tìm kiếm người dùng..."
+                           value="@ViewBag.Search">
+                </form>
+
+                <!-- ADD BUTTON -->
+                <a asp-controller="User"
+                   asp-action="Create"
+                   class="btn btn-success btn-sm ml-2">
+                    <i class="fas fa-plus"></i> Thêm người dùng
+                </a>
+
+            </div>
+        </div>
+
+
+            <!-- TABLE -->
+            <div class="card-body table-responsive p-0">
+                <table class="table table-bordered table-hover mb-0">
+                    <thead class="thead-light">
+                        <tr>
+                            <th style="width:80px;">STT</th>
+                            <th>Tên đăng nhập</th>
+                            <th style="width:150px;">Quyền</th>
+                            <th style="width:150px;">Trạng thái</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @foreach (var u in Model)
+                        {
+                            <tr onclick="window.location='@Url.Action("Details", "User", new { id = u.UserId })'"
+                                style="cursor:pointer">
+
+                                <td>@u.UserId</td>
+                                <td>@u.Username</td>
+                                <td>@(u.Role?.Rolename ?? "Không có")</td>
+
+                                <td>
+                                    @if (u.Isactive)
+                                    {
+                                        <span class="badge badge-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger">Inactive</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Search auto submit (GIỮ NGUYÊN LOGIC)
+        const searchInput = document.getElementById('searchInput');
+        const searchForm = document.getElementById('searchForm');
+        let timer;
+
+        searchInput.addEventListener('input', function () {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                searchForm.submit();
+            }, 300);
+        });
+    </script>
+}

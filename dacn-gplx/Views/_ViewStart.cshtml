@@ -1,0 +1,16 @@
+﻿@using System.Security.Claims
+
+@{
+    string roleId = User.FindFirst(ClaimTypes.Role)?.Value;
+
+    if (User.Identity != null && User.Identity.IsAuthenticated && roleId == "1")
+    {
+        // ROLE_ID = 1 => Admin
+        Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    }
+    else
+    {
+        // User thường hoặc chưa đăng nhập
+        Layout = "~/Views/Shared/_Layout.cshtml";
+    }
+}

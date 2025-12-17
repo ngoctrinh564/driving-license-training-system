@@ -1,0 +1,152 @@
+﻿@model dacn_gplx.ViewModels.ProfileViewModel
+
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+    bool edit = ViewBag.EditMode ?? false;
+
+    // Tình trạng hồ sơ (ví dụ: có giấy khám sức khỏe chưa)
+    string skkStatus = Model.KhamsuckhoeId == null
+        ? "❌ Chưa cập nhật giấy khám sức khỏe"
+        : "✔ Đã có giấy khám sức khỏe trong hệ thống";
+}
+
+<div class="container mt-4">
+
+    <h2 class="text-center mb-4">Thông tin cá nhân</h2>
+
+    <!-- Alert -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success text-center">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger text-center">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+    @if (TempData["WarningAvatar"] != null)
+    {
+        <div class="alert alert-warning text-center">
+            @TempData["WarningAvatar"]
+        </div>
+    }
+
+    <div class="row justify-content-center">
+
+        <!-- Ảnh đại diện -->
+        <div class="col-md-3 text-center">
+            <div class="card shadow-sm p-3">
+                <h5 class="mb-3">Ảnh đại diện</h5>
+
+                <img src="@Model.AvatarUrl"
+                     class="img-fluid rounded mb-3"
+                     style="max-height: 260px; object-fit: cover;" />
+
+                @if (!edit)
+                {
+                    <a href="/Profile?edit=true" class="btn btn-primary w-100">Chỉnh sửa</a>
+                }
+            </div>
+        </div>
+
+        <!-- Thông tin cá nhân -->
+        <div class="col-md-7">
+
+            @if (!edit)
+            {
+                <div class="card shadow-sm p-4">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="m-0">Thông tin chi tiết</h5>
+
+                        <a href="/Profile?edit=true" class="btn btn-outline-primary btn-sm">
+                            Chỉnh sửa
+                        </a>
+                    </div>
+
+                    <table class="table table-borderless table-striped">
+                        <tr><th>Họ tên</th><td>@Model.Hoten</td></tr>
+                        <tr><th>CMND/CCCD</th><td>@Model.SoCmndCccd</td></tr>
+                        <tr><th>Năm sinh</th><td>@Model.Namsinh?.ToString("dd/MM/yyyy")</td></tr>
+                        <tr><th>Giới tính</th><td>@Model.Gioitinh</td></tr>
+                        <tr><th>Số điện thoại</th><td>@Model.Sdt</td></tr>
+                        <tr><th>Email</th><td>@Model.Mail</td></tr>
+                    </table>
+
+                    <hr />
+
+                    <h6 class="text-secondary">Tình trạng hồ sơ:</h6>
+                    <p class="fw-bold @(Model.KhamsuckhoeId == null ? "text-danger" : "text-success")">
+                        @skkStatus
+                    </p>
+
+                </div>
+            }
+            else
+            {
+                <!-- Form chỉnh sửa -->
+                <div class="card shadow-sm p-4">
+
+                    <h5 class="mb-3">Chỉnh sửa thông tin</h5>
+
+                    <form asp-action="Update" method="post" enctype="multipart/form-data">
+
+                        <input type="hidden" asp-for="HocvienId" />
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Hoten" class="form-label"></label>
+                                <input asp-for="Hoten" class="form-control" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SoCmndCccd" class="form-label"></label>
+                                <input asp-for="SoCmndCccd" class="form-control" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Namsinh" class="form-label"></label>
+                                <input asp-for="Namsinh" type="date" class="form-control" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Gioitinh" class="form-label"></label>
+                                <select asp-for="Gioitinh" class="form-select">
+                                    <option value="Nam">Nam</option>
+                                    <option value="Nữ">Nữ</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Sdt" class="form-label"></label>
+                                <input asp-for="Sdt" class="form-control" />
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Mail" class="form-label"></label>
+                                <input asp-for="Mail" class="form-control" />
+                            </div>
+
+                            <div class="col-md-12 mb-3">
+                                <label class="form-label">Ảnh đại diện mới (ảnh thẻ)</label>
+                                <input type="file" name="avatarFile" class="form-control" />
+                                <small class="text-muted">Chọn ảnh rõ mặt, nhìn thẳng.</small>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-success">Lưu thay đổi</button>
+                            <a href="/Profile" class="btn btn-secondary">Hủy</a>
+                        </div>
+
+                    </form>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>

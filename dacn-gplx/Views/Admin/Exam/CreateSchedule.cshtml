@@ -1,0 +1,54 @@
+﻿@model dacn_gplx.Models.LichThi
+
+@{
+    ViewData["Title"] = "Thêm Lịch Thi Mới";
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    // Lấy KythiId từ ViewBag
+    int examId = ViewBag.KythiId ?? 0;
+
+    // SỬA: Lấy Ngày Mai (DateTime.Today.AddDays(1)) và định dạng nó thành yyyy-MM-ddTHH:mm
+    // Giúp input type="datetime-local" tự động bắt đầu từ ngày mai.
+    string minDateTime = DateTime.Today.AddDays(1).ToString("yyyy-MM-ddT00:00");
+}
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="card card-info">
+            <div class="card-header">
+            </div>
+
+            <form asp-action="CreateSchedule" method="post">
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <input type="hidden" asp-for="KythiId" value="@examId" />
+
+                    <div class="form-group">
+                        <label asp-for="Thoigianthi" class="control-label">Thời Gian Thi</label>
+                        <input asp-for="Thoigianthi" type="datetime-local" class="form-control" min="@minDateTime" />
+                        <span asp-validation-for="Thoigianthi" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label asp-for="Diadiem" class="control-label">Địa Điểm</label>
+                        <input asp-for="Diadiem" class="form-control" />
+                        <span asp-validation-for="Diadiem" class="text-danger"></span>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-calendar-plus"></i>
+                    </button>
+                    <a asp-action="Details" asp-route-id="@examId" class="btn btn-default float-right">Hủy bỏ</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

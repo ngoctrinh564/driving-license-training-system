@@ -1,0 +1,378 @@
+﻿@*
+    Layout chung cho toàn bộ hệ thống GPLX (User + Guest).
+    Admin dùng Layout riêng.
+*@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - Hệ thống GPLX</title>
+
+    <!-- BOOTSTRAP -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+
+    <!-- CUSTOM CSS -->
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/dacn_gplx.styles.css" asp-append-version="true" />
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+
+    <style>
+        body {
+            background: #e7f2ff;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* ===== NAVIGATION ===== */
+        .navbar-custom {
+            background: linear-gradient(90deg, #1a73e8, #42a5f5);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+        }
+
+            .navbar-custom .navbar-brand {
+                font-size: 1.45rem;
+                font-weight: 700;
+                color: #fff !important;
+                letter-spacing: .3px;
+            }
+
+            .navbar-custom .nav-link {
+                color: #ffffff !important;
+                font-weight: 500;
+                padding-left: 14px;
+                padding-right: 14px;
+                transition: .25s;
+            }
+
+                .navbar-custom .nav-link:hover {
+                    color: #ffeb3b !important;
+                    transform: translateY(-1px);
+                }
+
+        .menu-icon {
+            margin-right: 6px;
+        }
+
+        /* Mobile toggler icon trắng */
+        .navbar-toggler {
+            border-color: #fff !important;
+        }
+
+        .navbar-toggler-icon {
+            filter: invert(1);
+        }
+
+        /* USER INFO */
+        .user-info {
+            color: #fff;
+            font-weight: 600;
+            margin-right: 12px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        main {
+            flex: 1;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            background: #ffffffdd;
+            backdrop-filter: blur(6px);
+            border-top: 1px solid #d7e2f3;
+            font-size: .9rem;
+        }
+
+        /* Icon mạng xã hội có màu */
+        .social-icon-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 1.25rem;
+            color: #fff;
+            transition: 0.2s;
+        }
+
+            .social-icon-badge.fb {
+                background: #1877f2; /* Facebook blue */
+            }
+
+            .social-icon-badge.mail {
+                background: #ea4335; /* Gmail red */
+            }
+
+            .social-icon-badge:hover {
+                transform: translateY(-2px) scale(1.05);
+                box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+            }
+    </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg navbar-custom">
+        <div class="container-fluid">
+
+            <!-- LOGO -->
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                🚗 Hệ thống GPLX
+            </a>
+
+            <!-- BUTTON MOBILE -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- MENU -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+
+                <!-- LEFT -->
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Index">
+                            <i class="bi bi-house-door menu-icon"></i>Trang chủ
+                        </a>
+                    </li>
+
+                   <li class="nav-item">
+                        <a class="nav-link" asp-controller="Profile" asp-action="Index">
+                            <i class="bi bi-person-circle menu-icon"></i>Thông tin cá nhân
+                        </a>
+                    </li>
+
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="HoSoThiSinh" asp-action="Index">
+                                <i class="bi bi-person-badge-fill menu-icon"></i>Hồ sơ
+                            </a>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-journal-bookmark-fill me-2 menu-icon"></i>
+                                <span>Khóa học</span>
+                            </a>
+
+                            <ul class="dropdown-menu shadow-sm">
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" asp-controller="DangKiKhoaHoc" asp-action="Index">
+                                        <i class="bi bi-pencil-square me-2"></i>
+                                        Đăng ký khóa học
+                                    </a>
+                                </li>
+
+                                <li>
+                                    <a class="dropdown-item d-flex align-items-center" asp-controller="DangKiKhoaHoc" asp-action="KetQuaHocTap">
+                                        <i class="bi bi-journal-check me-2"></i>
+                                        Kết quả học tập
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="examDropdown" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-calendar-check menu-icon"></i> Lịch thi
+                            </a>
+
+                            <ul class="dropdown-menu" aria-labelledby="examDropdown">
+                                <li>
+                                    <a class="dropdown-item" asp-controller="DangKiThi" asp-action="Index">
+                                        📅 Kỳ thi
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" asp-controller="DangKiThi" asp-action="DanhSachKQThi">
+                                        📝 Bài thi
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="PhieuThanhToan" asp-action="Index">
+                                <i class="bi bi-person-badge-fill menu-icon"></i>Thanh toán
+                            </a>
+                        </li>
+
+                    }
+                </ul>
+
+                <!-- RIGHT -->
+                <ul class="navbar-nav mb-2 mb-lg-0">
+
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <li class="nav-item d-flex align-items-center">
+                            <span class="user-info">👤 @User.Identity.Name</span>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="btn btn-light fw-semibold"
+                               asp-controller="Auth" asp-action="Logout">
+                                Đăng xuất
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="btn btn-outline-light me-2"
+                               asp-controller="Auth" asp-action="Login">
+                                Đăng nhập
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="btn btn-warning"
+                               asp-controller="Auth" asp-action="Register">
+                                Đăng ký
+                            </a>
+                        </li>
+                    }
+
+                </ul>
+            </div>
+
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="container my-4">
+        @RenderBody()
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-auto py-4">
+        <div class="container">
+
+            <div class="row">
+
+                <div class="col-md-9 mb-3">
+                    <h6 class="text-dark fw-bold">Hệ thống đào tạo GPLX</h6>
+                    <p class="mb-1">
+                        Nền tảng hỗ trợ học viên của trung tâm đào tạo giấy phép lái xe.
+                    </p>
+                    <p class="mb-0">
+                        Cung cấp khóa học, quản lý học viên, lịch thi, kết quả thi và quản lý GPLX.
+                    </p>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <h6 class="text-dark fw-bold">Liên hệ</h6>
+
+                    <a href="https://facebook.com"
+                       target="_blank"
+                       class="social-icon-badge fb">
+                        <i class="bi bi-facebook"></i>
+                    </a>
+
+                    <a href="mailto:doanchuyennganhhttt@gmail.com"
+                       class="social-icon-badge mail">
+                        <i class="bi bi-envelope-fill"></i>
+                    </a>
+                </div>
+
+            </div>
+
+            <div class="border-top mt-3 pt-3 text-center small">
+                &copy; @DateTime.Now.Year - Hệ thống đào tạo & quản lý giấy phép lái xe
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+    @if (User.Identity.IsAuthenticated)
+    {
+        <div id="chatRoot"></div>
+
+        <a href="javascript:void(0)"
+           id="chatBubble"
+           style="position:fixed; bottom:20px; right:20px;
+              width:55px; height:55px;
+              background:#0d6efd; color:white;
+              border-radius:50%;
+              display:flex; align-items:center; justify-content:center;
+              font-size:24px; z-index:9999;
+              position:fixed;">
+            💬
+            <span id="chatUnread"
+                  style="display:none;
+                     position:absolute;
+                     top:-5px; right:-5px;
+                     background:red; color:white;
+                     font-size:12px;
+                     min-width:20px; height:20px;
+                     border-radius:50%;
+                     display:flex;
+                     align-items:center;
+                     justify-content:center;">
+                0
+            </span>
+        </a>
+
+        <script>
+            $(document).ready(function () {
+
+                // MỞ CHAT
+                $("#chatBubble").click(function () {
+                    $("#chatBubble").hide();        // ✅ ẨN BONG BÓNG
+
+                    if ($("#chatRoot").children().length === 0) {
+                        $("#chatRoot").load("/Chat/Index", function () {
+                            markUserRead();
+                        });
+                    } else {
+                        $("#chatRoot").show();
+                        markUserRead();
+                    }
+                });
+
+                // GỌI TỪ VIEW CHAT (nút ─)
+                window.closeChat = function () {
+                    $("#chatRoot").hide();          // ẨN KHUNG CHAT
+                    $("#chatBubble").show();        // ✅ HIỆN LẠI BONG BÓNG
+                }
+
+                function markUserRead() {
+                    $.post("/Chat/MarkUserRead", function () {
+                        $("#chatUnread").hide();
+                    });
+                }
+
+                function loadUnread() {
+                    $.get("/Chat/GetUserUnreadCount", function (count) {
+                        if (count > 0) {
+                            $("#chatUnread").text(count).show();
+                        } else {
+                            $("#chatUnread").hide();
+                        }
+                    });
+                }
+
+                loadUnread();
+                setInterval(loadUnread, 5000);
+            });
+        </script>
+
+    }
+</body>
+
+</html>

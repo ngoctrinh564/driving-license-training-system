@@ -1,0 +1,88 @@
+﻿@model List<dacn_gplx.Models.KetQuaHocTap>
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Danh sách kết quả học tập";
+}
+
+<div class="card">
+
+    <!-- CARD HEADER -->
+    <div class="card-header d-flex align-items-center">
+
+        <div class="ml-auto">
+            <form id="searchForm"
+                  method="get"
+                  asp-controller="KetQua"
+                  asp-action="HocTap"
+                  class="input-group input-group-sm"
+                  style="width: 260px;">
+                <input type="text"
+                       name="search"
+                       id="searchInput"
+                       class="form-control"
+                       placeholder="Tìm kiếm học viên hoặc hồ sơ..."
+                       value="@ViewBag.Search">
+            </form>
+        </div>
+    </div>
+
+
+    <!-- BODY -->
+    <div class="card-body table-responsive p-0">
+        <table class="table table-hover table-striped text-nowrap">
+            <thead>
+                <tr>
+                    <th style="width:50px;">STT</th>
+                    <th style="width:150px;">Học viên</th>
+                    <th style="width:150px;">Hồ sơ</th>
+                    <th style="width:100px;">Số buổi học</th>
+                    <th style="width:100px;">Số buổi vắng</th>
+                    <th style="max-width:200px;">Nhận xét</th>
+                    <th style="width:120px;">Số KM hoàn thành</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="clickable-row"
+                        data-href="@Url.Action("ChiTietHocTap", "KetQua", new { id = item.KetquahoctapId })"
+                        style="cursor:pointer;">
+                        <td>@item.KetquahoctapId</td>
+                        <td>@item.Hoso?.Hocvien?.Hoten</td>
+                        <td>@item.Hoso?.Tenhoso</td>
+                        <td>@item.Sobuoihoc</td>
+                        <td>@item.Sobuoivang</td>
+                        <td style="max-width:200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                            @item.Nhanxet
+                        </td>
+                        <td>@item.Sokmhoanthanh</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll(".clickable-row").forEach(row => {
+            row.addEventListener("click", function () {
+                window.location.href = this.dataset.href;
+            });
+        });
+
+        // Tìm kiếm realtime
+        const searchInput = document.getElementById('searchInput');
+        const form = document.getElementById('searchForm');
+        let typingTimer;
+
+        searchInput.addEventListener('input', function () {
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                form.submit();
+            }, 300);
+        });
+    </script>
+}

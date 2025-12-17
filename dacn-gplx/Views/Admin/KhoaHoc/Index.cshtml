@@ -1,0 +1,170 @@
+﻿@model List<dacn_gplx.Models.KhoaHoc>
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Quản lý khóa học";
+
+    var q = ViewContext.HttpContext.Request.Query;
+}
+
+<style>
+    .badge-blue {
+        background-color: #3b82f6 !important;
+        color: white !important;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+    .badge-yellow {
+        background-color: #facc15 !important;
+        color: #000 !important;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+    .badge-red {
+        background-color: #ef4444 !important;
+        color: white !important;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+    }
+
+    tr.row-click:hover {
+        background-color: #f0f9ff !important;
+        cursor: pointer;
+    }
+</style>
+
+<div class="card">
+
+    <!-- HEADER -->
+    <div class="card-header d-flex align-items-center" style="white-space: nowrap;">
+
+        <!-- FORM BỘ LỌC -->
+        <form method="get" class="form-inline d-flex align-items-center" style="flex-grow: 1; flex-wrap: nowrap;">
+
+            <!-- Hạng GPLX -->
+            <select name="hangId" class="form-control mr-2" style="height:34px; width:150px;">
+                <option value="">Hạng GPLX</option>
+                @foreach (var h in ViewBag.HangList)
+                {
+                    bool selected = q["hangId"] == h.Value;
+                    <option value="@h.Value" selected="@(selected ? "selected" : null)">
+                        @h.Text
+                    </option>
+                }
+            </select>
+
+            <!-- Trạng thái -->
+            <select name="trangThai" class="form-control mr-2" style="height:34px; width:150px;">
+                <option value="">Trạng thái</option>
+                @foreach (var t in ViewBag.TrangThaiList)
+                {
+                    bool selected = q["trangThai"] == t.Value;
+                    <option value="@t.Value" selected="@(selected ? "selected" : null)">
+                        @t.Text
+                    </option>
+                }
+            </select>
+
+            <!-- Từ khóa -->
+            <input type="text"
+                   name="tuKhoa"
+                   class="form-control mr-2"
+                   placeholder="Nhập tên khóa học..."
+                   value="@q["tuKhoa"]"
+                   style="width:200px;" />
+
+            <!-- Nút lọc -->
+            <button type="submit" class="btn btn-primary mr-1">
+                <i class="fas fa-search"></i>
+            </button>
+
+            <!-- Nút reset -->
+            <a asp-controller="KhoaHoc" asp-action="Index" class="btn btn-secondary mr-2">
+                <i class="fas fa-redo"></i>
+            </a>
+
+            <!-- Nút thêm khóa học: căn phải -->
+            <div class="ml-auto">
+                <a asp-controller="KhoaHoc" asp-action="Create" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Thêm khóa học
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="card-body table-responsive p-0">
+        <table class="table table-hover table-bordered text-nowrap">
+            <thead class="thead-light">
+                <tr>
+                    <th style="width:60px;">ID</th>
+                    <th>Tên khóa học</th>
+                    <th>Hạng</th>
+                    <th>Học phí</th>
+                    <th>Ngày bắt đầu</th>
+                    <th>Ngày kết thúc</th>
+                    <th>Địa điểm</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            <i class="fas fa-folder-open fa-2x d-block mb-2"></i>
+                            Không tìm thấy kết quả
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    int stt = 1;
+
+                    foreach (var item in Model)
+                    {
+                        string badgeClass = item.Trangthai switch
+                        {
+                            "Sắp khai giảng" => "badge-blue",
+                            "Đang học" => "badge-yellow",
+                            "Đã kết thúc" => "badge-red",
+                            _ => "badge-secondary"
+                        };
+
+                        <tr class="row-click"
+                            onclick="window.location='@Url.Action("Details", "KhoaHoc", new { id = item.KhoahocId })'"
+                            style="cursor:pointer;">
+
+                            <td>@stt</td>
+                            <td>@item.TenKhoaHoc</td>
+                            <td>@item.Hang?.Tenhang</td>
+                            <td>@(item.Hang?.Hocphi?.ToString("N0") ?? "-")</td>
+                            <td>@item.Ngaybatdau?.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Ngayketthuc?.ToString("dd/MM/yyyy")</td>
+                            <td>@item.Diadiem</td>
+
+                            <td>
+                                <span class="@badgeClass">
+                                    @item.Trangthai
+                                </span>
+                            </td>
+
+                        </tr>
+
+                        stt++;
+                    }
+                }
+            </tbody>
+
+        </table>
+    </div>
+
+</div>

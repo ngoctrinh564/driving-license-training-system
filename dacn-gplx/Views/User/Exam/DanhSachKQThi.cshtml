@@ -1,0 +1,58 @@
+﻿@model List<dacn_gplx.Models.ChiTietKetQuaThi>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mb-3">Danh sách bài thi</h2>
+<!-- Hiển thị TempData Warning nếu có -->
+@if (TempData["ThiWarning"] != null)
+{
+    <div class="alert alert-warning">
+        @TempData["ThiWarning"]
+    </div>
+}
+@if (Model.Count == 0)
+{
+    <div class="alert alert-warning">Bạn chưa có kết quả bài thi nào.</div>
+}
+else
+{
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Tên bài thi</th>
+                <th>Loại bài thi</th>
+                <th>Mô tả</th>
+                <th>Hồ sơ</th> <!-- thêm cột -->
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr style="cursor:pointer;"
+                    onclick="window.location='@Url.Action("ChiTietKQThi", "DangKiThi", new { baithiId = item.BaithiId })'">
+
+                    <td>@item.Baithi.Tenbaithi</td>
+                    <td>@item.Baithi.Loaibaithi</td>
+                    <td>@item.Baithi.Mota</td>
+                    <td>
+                        @(
+                                        string.IsNullOrWhiteSpace(item.Hoso?.Tenhoso)
+                                        ? $"Hồ sơ #{item.HosoId}"
+                                        : item.Hoso.Tenhoso
+                                        )
+                </td>
+                <td>
+                    <a asp-action="ChiTietKQThi"
+                       asp-route-baithiId="@item.BaithiId"
+                       class="btn btn-sm btn-primary">
+                        Xem chi tiết
+                    </a>
+                </td>
+            </tr>
+                }
+        </tbody>
+    </table>
+}

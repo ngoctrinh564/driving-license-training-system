@@ -1,0 +1,33 @@
+﻿@model dacn_gplx.Models.ChiTietKetQuaThi
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-4">Chi Tiết Kết Quả Thi</h2>
+
+    <div class="card shadow-sm p-4">
+        <div class="mb-3">
+            <strong>Tên bài thi:</strong> @Model.Baithi.Tenbaithi
+        </div>
+        <div class="mb-3">
+            <strong>Loại bài thi:</strong> @Model.Baithi.Loaibaithi
+        </div>
+        <div class="mb-3">
+            <strong>Hồ Sơ:</strong> @(Model.Hoso?.Tenhoso ?? $"Hồ sơ #{Model.HosoId}")
+        </div>
+        <div class="mb-3">
+            <strong>Tổng điểm:</strong> @(Model.TongDiem.HasValue? Model.TongDiem.Value.ToString() : "0")
+        </div>
+        <div class="mb-3">
+            <strong>Kết quả đạt được:</strong> @(string.IsNullOrEmpty(Model.KetQuaDatDuoc) ? "Chưa có kết quả" : Model.KetQuaDatDuoc)
+        </div>
+
+        <div class="mt-4">
+            <a asp-controller="DangKiThi" asp-action="DanhSachKQThi" class="btn btn-primary">
+                ← Quay lại danh sách kết quả
+            </a>
+        </div>
+    </div>
+</div>

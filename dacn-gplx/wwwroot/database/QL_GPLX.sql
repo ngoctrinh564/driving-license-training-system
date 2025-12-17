@@ -1,0 +1,573 @@
+﻿DROP DATABASE IF EXISTS QuanLyGPLX;
+GO
+
+CREATE DATABASE QuanLyGPLX;
+GO
+USE QuanLyGPLX;
+GO
+
+-- 1. ROLE
+CREATE TABLE ROLE (
+    ROLE_ID INT IDENTITY(1,1) PRIMARY KEY,
+    ROLENAME NVARCHAR(100),
+    MOTA NVARCHAR(255)
+);
+
+-- 2. USER
+CREATE TABLE [USER] (
+    USER_ID INT IDENTITY(1,1) PRIMARY KEY,
+    ROLE_ID INT,
+    USERNAME NVARCHAR(100),
+    [PASSWORD] NVARCHAR(255),
+    ISACTIVE BIT,
+    FOREIGN KEY (ROLE_ID) REFERENCES ROLE(ROLE_ID)
+);
+
+-- 3. HOC_VIEN
+CREATE TABLE HOC_VIEN (
+    HOCVIEN_ID INT IDENTITY(1,1) PRIMARY KEY,
+    HOTEN NVARCHAR(100),
+    SO_CMND_CCCD NVARCHAR(20),
+    NAMSINH DATE,
+    GIOITINH NVARCHAR(10),
+    SDT NVARCHAR(15),
+	Mail NVARCHAR (50),
+    USER_ID INT,
+    FOREIGN KEY (USER_ID) REFERENCES [USER](USER_ID)
+);
+ALTER TABLE HOC_VIEN
+ADD AvatarUrl NVARCHAR(500) NULL;
+
+-- 4. PHIEU_KHAM_SUC_KHOE
+CREATE TABLE PHIEU_KHAM_SUC_KHOE (
+    KHAMSUCKHOE_ID INT IDENTITY(1,1) PRIMARY KEY,
+    HIEULUC NVARCHAR(50) NULL,              -- Thời hạn hiệu lực (ví dụ: "6 tháng", "1 năm")
+    THOIHAN DATE NULL,                      -- Ngày hết hạn hoặc thời hạn đến
+    KHAMMAT NVARCHAR(50) NULL,              -- Kết quả khám mắt (ví dụ: "10/10", "8/10")
+    HUYETAP NVARCHAR(50) NULL,              -- Huyết áp (ví dụ: "120/80 mmHg")
+    CHIEUCAO DECIMAL(5,2) NULL,             -- Chiều cao (mét) – ví dụ: 1.70
+    CANNANG DECIMAL(5,2) NULL               -- Cân nặng (kg) – ví dụ: 60.50
+);
+ALTER TABLE PHIEU_KHAM_SUC_KHOE
+ADD UrlAnh NVARCHAR(500) NULL
+
+-- 5. HANG_GPLX
+CREATE TABLE HANG_GPLX (
+    HANG_ID INT IDENTITY(1,1) PRIMARY KEY,
+    TENHANG NVARCHAR(20),
+    MOTA NVARCHAR(255),
+    LOAIPHUONGTIEN NVARCHAR(100),
+    THOIHANLYTHUYET INT,
+    THOIHANTHUCHANH INT
+);
+
+-- 6. HO_SO_THI_SINH
+CREATE TABLE HO_SO_THI_SINH (
+    HOSO_ID INT IDENTITY(1,1) PRIMARY KEY,
+    HOCVIEN_ID INT,
+    TENHOSO NVARCHAR(100),
+    NGAYDANGKY DATE,
+    TRANGTHAI NVARCHAR(50),
+    GHICHU NVARCHAR(255),
+    KHAMSUCKHOE_ID INT,
+    HANG_ID INT,
+    FOREIGN KEY (HOCVIEN_ID) REFERENCES HOC_VIEN(HOCVIEN_ID),
+    FOREIGN KEY (KHAMSUCKHOE_ID) REFERENCES PHIEU_KHAM_SUC_KHOE(KHAMSUCKHOE_ID),
+    FOREIGN KEY (HANG_ID) REFERENCES HANG_GPLX(HANG_ID)
+);
+
+-- 7. PHIEU_THANH_TOAN
+CREATE TABLE PHIEU_THANH_TOAN (
+    PHIEU_ID INT IDENTITY(1,1) PRIMARY KEY,
+    TENPHIEU NVARCHAR(100),
+    NGAYLAP DATE,
+    TONGTIEN DECIMAL(18,2),
+    NGAYNOP DATE,
+	ANHMINHCHUNG NVARCHAR(255) NULL,
+	TRANGTHAI NVARCHAR(50) DEFAULT 'ChuaThanhToan'
+);
+
+-- 8. CHI_TIET_PHIEU_THANH_TOAN
+CREATE TABLE CHI_TIET_PHIEU_THANH_TOAN (
+    HOSO_ID INT,
+    PHIEU_ID INT,
+    LOAIPHI NVARCHAR(100),
+    GHICHU NVARCHAR(255),
+    PRIMARY KEY (HOSO_ID, PHIEU_ID),
+    FOREIGN KEY (HOSO_ID) REFERENCES HO_SO_THI_SINH(HOSO_ID),
+    FOREIGN KEY (PHIEU_ID) REFERENCES PHIEU_THANH_TOAN(PHIEU_ID)
+);
+
+-- 9. GIAY_PHEP_LAI_XE
+CREATE TABLE GIAY_PHEP_LAI_XE (
+    GPLX_ID INT IDENTITY(1,1) PRIMARY KEY,
+    NGAYCAP DATE,
+    NGAYHETHAN DATE,
+    TRANGTHAI NVARCHAR(50),
+    HOSO_ID INT,
+    FOREIGN KEY (HOSO_ID) REFERENCES HO_SO_THI_SINH(HOSO_ID)
+);
+
+-- 10. CHI_TIET_GPLX
+CREATE TABLE CHI_TIET_GPLX (
+    HANG_ID INT,
+    GPLX_ID INT,
+    NGAY_CAP_CTGP DATE,
+    PRIMARY KEY (HANG_ID, GPLX_ID),
+    FOREIGN KEY (HANG_ID) REFERENCES HANG_GPLX(HANG_ID),
+    FOREIGN KEY (GPLX_ID) REFERENCES GIAY_PHEP_LAI_XE(GPLX_ID)
+);
+
+-- 11. YEU_CAU_NANG_HANG
+CREATE TABLE YEU_CAU_NANG_HANG (
+    YEUCAU_ID INT IDENTITY(1,1) PRIMARY KEY,
+    NOIDUNG NVARCHAR(255),
+    DIEUKIEN NVARCHAR(255),
+    GPLX_ID INT,
+    FOREIGN KEY (GPLX_ID) REFERENCES GIAY_PHEP_LAI_XE(GPLX_ID)
+);
+
+-- 12. KHOA_HOC
+CREATE TABLE KHOA_HOC (
+    KHOAHOC_ID INT IDENTITY(1,1) PRIMARY KEY,
+    HANG_ID INT,
+    NGAYBATDAU DATE,
+    NGAYKETTHUC DATE,
+    DIADIEM NVARCHAR(255),
+    TRANGTHAI NVARCHAR(50),
+    FOREIGN KEY (HANG_ID) REFERENCES HANG_GPLX(HANG_ID)
+);
+
+-- 13. CHI_TIET_KET_QUA_HOC_TAP
+CREATE TABLE CHI_TIET_KET_QUA_HOC_TAP (
+    KETQUAHOCTAP_ID INT IDENTITY(1,1) PRIMARY KEY,
+    KHOAHOC_ID INT,
+    LYTHUYET_KQ BIT,
+    SAHINH_KQ BIT,
+    DUONGTRUONG_KQ BIT,
+    MOPHONG_KQ BIT,
+    FOREIGN KEY (KHOAHOC_ID) REFERENCES KHOA_HOC(KHOAHOC_ID)
+);
+
+-- 14. KET_QUA_HOC_TAP
+CREATE TABLE KET_QUA_HOC_TAP (
+    KETQUAHOCTAP_ID INT,
+    HOSO_ID INT,
+    NHANXET NVARCHAR(255),
+    SOBUOIHOC INT,
+    SOBUOIVANG INT,
+    SOKMHOANTHANH NVARCHAR(100),
+    PRIMARY KEY (KETQUAHOCTAP_ID),
+    FOREIGN KEY (KETQUAHOCTAP_ID) REFERENCES CHI_TIET_KET_QUA_HOC_TAP(KETQUAHOCTAP_ID),
+    FOREIGN KEY (HOSO_ID) REFERENCES HO_SO_THI_SINH(HOSO_ID)
+);
+
+-- 15. KY_THI
+CREATE TABLE KY_THI (
+    KYTHI_ID INT IDENTITY(1,1) PRIMARY KEY,
+    TENKYTHI NVARCHAR(100),
+    LOAIKYTHI NVARCHAR(50),
+	TRANGTHAI BIT
+);
+
+-- 16. LICH_THI
+CREATE TABLE LICH_THI (
+    LICHTHI_ID INT IDENTITY(1,1) PRIMARY KEY,
+    THOIGIANTHI DATETIME,
+    DIADIEM NVARCHAR(255),
+	KYTHI_ID INT,
+	FOREIGN KEY (KYTHI_ID) REFERENCES KY_THI(KYTHI_ID)
+);
+
+-- 17. CHI_TIET_DANG_KY_THI
+CREATE TABLE CHI_TIET_DANG_KY_THI (
+    KYTHI_ID INT,
+    HOSO_ID INT,
+    THOIGIANDANGKY DATETIME,
+    PRIMARY KEY (KYTHI_ID, HOSO_ID),
+    FOREIGN KEY (KYTHI_ID) REFERENCES KY_THI(KYTHI_ID),
+    FOREIGN KEY (HOSO_ID) REFERENCES HO_SO_THI_SINH(HOSO_ID),
+);
+
+-- 18. BAI_THI
+CREATE TABLE BAI_THI (
+    BAITHI_ID INT IDENTITY(1,1) PRIMARY KEY,
+    TENBAITHI NVARCHAR(100),
+    MOTA NVARCHAR(255),
+    LOAIBAITHI NVARCHAR(50),
+    KYTHI_ID INT,
+    FOREIGN KEY (KYTHI_ID) REFERENCES KY_THI(KYTHI_ID)
+);
+
+-- 19. CAN_BO_GIAM_SAT
+CREATE TABLE CAN_BO_GIAM_SAT (
+    CANBO_ID INT IDENTITY(1,1) PRIMARY KEY,
+    HOTEN NVARCHAR(100),
+    NGAYSINH DATE,
+    GIOITINH NVARCHAR(10),
+    DIACHI NVARCHAR(255),
+    EMAIL NVARCHAR(100),
+    SDT NVARCHAR(15)
+);
+
+-- 20. CHI_TIET_PHAN_CONG_GIAM_SAT
+CREATE TABLE CHI_TIET_PHAN_CONG_GIAM_SAT (
+    BAITHI_ID INT,
+    CANBO_ID INT,
+    THOIGIANBATDAU DATETIME,
+    THOIGIANKETTHUC DATETIME,
+    PHONGTHI NVARCHAR(100),
+    GHICHU NVARCHAR(255),
+    PRIMARY KEY (BAITHI_ID, CANBO_ID),
+    FOREIGN KEY (BAITHI_ID) REFERENCES BAI_THI(BAITHI_ID),
+    FOREIGN KEY (CANBO_ID) REFERENCES CAN_BO_GIAM_SAT(CANBO_ID)
+);
+
+-- 21. CHI_TIET_KET_QUA_THI
+CREATE TABLE CHI_TIET_KET_QUA_THI (
+    BAITHI_ID INT,
+    HOSO_ID INT,
+    KET_QUA_DAT_DUOC NVARCHAR(50),
+    TONG_DIEM FLOAT,
+    PRIMARY KEY (BAITHI_ID, HOSO_ID),
+    FOREIGN KEY (BAITHI_ID) REFERENCES BAI_THI(BAITHI_ID),
+    FOREIGN KEY (HOSO_ID) REFERENCES HO_SO_THI_SINH(HOSO_ID)
+);
+
+-- 22. ANH_GKSK
+CREATE TABLE ANH_GKSK (
+    ANH_ID INT IDENTITY(1,1) PRIMARY KEY,
+    KHAMSUCKHOE_ID INT NOT NULL,
+    URLANH NVARCHAR(300) NOT NULL,
+
+    FOREIGN KEY (KHAMSUCKHOE_ID) REFERENCES PHIEU_KHAM_SUC_KHOE(KHAMSUCKHOE_ID)
+);
+/*
+-- Xóa dữ liệu và reset IDENTITY cho các bảng
+-- Thứ tự xóa phải từ bảng con → bảng cha để tránh lỗi FK
+
+-- 1️⃣ CHI_TIET_KET_QUA_HOC_TAP
+DELETE FROM CHI_TIET_KET_QUA_HOC_TAP;
+DBCC CHECKIDENT('CHI_TIET_KET_QUA_HOC_TAP', RESEED, 0);
+GO
+
+-- 3️⃣ CHI_TIET_KET_QUA_THI
+DELETE FROM CHI_TIET_KET_QUA_THI;
+-- Không cần reset IDENTITY
+GO
+
+-- 4️⃣ LICH_THI
+DELETE FROM LICH_THI;
+DBCC CHECKIDENT('LICH_THI', RESEED, 0);
+GO
+
+-- 5️⃣ BAI_THI
+DELETE FROM BAI_THI;
+DBCC CHECKIDENT('BAI_THI', RESEED, 0);
+GO
+
+-- 6️⃣ KY_THI
+DELETE FROM KY_THI;
+DBCC CHECKIDENT('KY_THI', RESEED, 0);
+GO
+
+-- 7️⃣ CHI_TIET_PHIEU_THANH_TOAN
+DELETE FROM CHI_TIET_PHIEU_THANH_TOAN;
+-- Không có IDENTITY
+GO
+
+-- 8️⃣ PHIEU_THANH_TOAN
+DELETE FROM PHIEU_THANH_TOAN;
+DBCC CHECKIDENT('PHIEU_THANH_TOAN', RESEED, 0);
+GO
+
+-- 9️⃣ GIAY_PHEP_LAI_XE
+DELETE FROM GIAY_PHEP_LAI_XE;
+DBCC CHECKIDENT('GIAY_PHEP_LAI_XE', RESEED, 0);
+GO
+
+-- 🔟 HO_SO_THI_SINH
+DELETE FROM HO_SO_THI_SINH;
+DBCC CHECKIDENT('HO_SO_THI_SINH', RESEED, 0);
+GO
+
+-- 11️⃣ PHIEU_KHAM_SUC_KHOE
+DELETE FROM PHIEU_KHAM_SUC_KHOE;
+DBCC CHECKIDENT('PHIEU_KHAM_SUC_KHOE', RESEED, 0);
+GO
+
+-- 12️⃣ KHOA_HOC
+DELETE FROM KHOA_HOC;
+DBCC CHECKIDENT('KHOA_HOC', RESEED, 0);
+GO
+
+-- 13️⃣ HANG_GPLX
+DELETE FROM HANG_GPLX;
+DBCC CHECKIDENT('HANG_GPLX', RESEED, 0);
+GO
+
+-- 14️⃣ HOC_VIEN
+DELETE FROM HOC_VIEN;
+DBCC CHECKIDENT('HOC_VIEN', RESEED, 0);
+GO
+
+-- 15️⃣ USER
+DELETE FROM [USER];
+DBCC CHECKIDENT('[USER]', RESEED, 0);
+GO
+
+-- 16️⃣ ROLE
+DELETE FROM ROLE;
+DBCC CHECKIDENT('ROLE', RESEED, 0);
+GO
+
+
+*/
+-- 1️⃣ ROLE
+INSERT INTO ROLE (ROLENAME, MOTA)
+VALUES
+(N'Admin', N'Quản trị hệ thống'),
+(N'User', N'Học viên thông thường');
+GO
+
+-- 2️⃣ USER
+INSERT INTO [USER] (ROLE_ID, USERNAME, [PASSWORD], ISACTIVE)  -- PASS(mã hóa bcrypt): "Gplx@000"
+VALUES
+(1, N'admin', N'$2a$12$Bg5w2/JMtIR1BqNS5Q3Oxe0SLmolis8N1YhWgin2q.kFvwHZZ./da', 1),
+(2, N'nguyen.van.dung', N'$2a$12$Bg5w2/JMtIR1BqNS5Q3Oxe0SLmolis8N1YhWgin2q.kFvwHZZ./da', 1),
+(2, N'tran.thi.kim.anh', N'$2a$12$Bg5w2/JMtIR1BqNS5Q3Oxe0SLmolis8N1YhWgin2q.kFvwHZZ./da', 1),
+(2, N'pham.hoang.nam', N'$2a$12$Bg5w2/JMtIR1BqNS5Q3Oxe0SLmolis8N1YhWgin2q.kFvwHZZ./da', 1),
+(2, N'vu.thu.trang', N'$2a$12$Bg5w2/JMtIR1BqNS5Q3Oxe0SLmolis8N1YhWgin2q.kFvwHZZ./da', 1),
+(2, N'ngo.quoc.khanh', N'$2a$12$Bg5w2/JMtIR1BqNS5Q3Oxe0SLmolis8N1YhWgin2q.kFvwHZZ./da', 1);
+GO
+
+-- 3️⃣ HOC_VIEN
+INSERT INTO HOC_VIEN (HOTEN, SO_CMND_CCCD, NAMSINH, GIOITINH, SDT, Mail, USER_ID)
+VALUES
+(N'Nguyễn Văn Dũng', N'012345678901', '2000-05-10', N'Nam', N'0905123456', N'vdung@example.com', 2),
+(N'Trần Thị Kim Anh', N'023456789012', '1999-09-20', N'Nữ', N'0905234567', N'ktanh@example.com', 3),
+(N'Phạm Hoàng Nam', N'034567890123', '2001-01-15', N'Nam', N'0905345678', N'hnam@example.com', 4),
+(N'Vũ Thu Trang', N'045678901234', '2002-03-25', N'Nữ', N'0905456789', N'ttrang@example.com', 5),
+(N'Ngô Quốc Khánh', N'056789012345', '1998-07-12', N'Nam', N'0905567890', N'qkhanh@example.com', 6);
+GO
+
+
+-- 4️⃣ PHIEU_KHAM_SUC_KHOE (INSERT đầy đủ)
+INSERT INTO PHIEU_KHAM_SUC_KHOE (HIEULUC, THOIHAN, KHAMMAT, HUYETAP, CHIEUCAO, CANNANG)
+VALUES
+(N'12 tháng', '2026-11-12', N'10/10', N'120/80 mmHg', 1.70, 60.5),
+(N'12 tháng', '2026-11-12', N'9/10',  N'110/70 mmHg', 1.65, 55.0),
+(N'24 tháng', '2027-11-12', N'10/10', N'118/78 mmHg', 1.75, 68.2);
+GO
+
+
+-- 5️⃣ HANG_GPLX
+INSERT INTO HANG_GPLX (TENHANG, MOTA, LOAIPHUONGTIEN, THOIHANLYTHUYET, THOIHANTHUCHANH)
+VALUES
+(N'A1',  N'Cấp cho người lái xe mô tô hai bánh có dung tích xi-lanh đến 125 cm³ hoặc công suất động cơ điện đến 11 kW.', N'Xe máy', 15, 10),
+(N'A',   N'Cấp cho người lái xe mô tô hai bánh có dung tích xi-lanh trên 125 cm³ hoặc công suất động cơ điện trên 11 kW.', N'Xe máy', 20, 15),
+(N'B1',  N'Cấp cho người lái xe ô tô số tự động chở người đến 9 chỗ hoặc ô tô tải có khối lượng toàn bộ đến 3.500 kg.', N'Ô tô con', 25, 20),
+(N'B',   N'Cấp cho người lái xe ô tô chở người đến 8 chỗ hoặc ô tô tải đến 3.500 kg, kể cả xe rơ-moóc đến 750 kg.', N'Ô tô con', 30, 25),
+(N'C1',  N'Cấp cho người lái xe ô tô tải và chuyên dùng có khối lượng toàn bộ thiết kế từ trên 3.500 kg đến 7.500 kg.', N'Ô tô tải', 35, 30),
+(N'C',   N'Cấp cho người lái xe ô tô tải và chuyên dùng có khối lượng toàn bộ thiết kế trên 7.500 kg.', N'Ô tô tải', 40, 35),
+(N'D1',  N'Cấp cho người lái xe ô tô chở người đến 16 chỗ (kể cả chỗ lái) hoặc xe chở người đến 750 kg rơ-moóc.', N'Ô tô khách', 45, 40),
+(N'D2',  N'Cấp cho người lái xe ô tô chở người từ 16 đến 29 chỗ (không kể chỗ lái).', N'Ô tô khách', 45, 40),
+(N'D',   N'Cấp cho người lái xe ô tô chở người trên 29 chỗ hoặc xe giường nằm.', N'Ô tô khách', 45, 40),
+(N'BE',  N'Cấp cho người lái xe hạng B được phép kéo rơ-moóc trên 750 kg.', N'Ô tô kéo rơ-moóc', 45, 40),
+(N'C1E', N'Cấp cho người lái xe hạng C1 được phép kéo rơ-moóc trên 750 kg.', N'Ô tô kéo rơ-moóc', 45, 40),
+(N'CE',  N'Cấp cho người lái xe hạng C được phép kéo rơ-moóc trên 750 kg hoặc xe đầu kéo sơ-mi rơ-moóc.', N'Đầu kéo', 45, 40),
+(N'D1E', N'Cấp cho người lái xe hạng D1 được phép kéo rơ-moóc trên 750 kg.', N'Ô tô kéo rơ-moóc', 45, 40),
+(N'D2E', N'Cấp cho người lái xe hạng D2 được phép kéo rơ-moóc trên 750 kg.', N'Ô tô kéo rơ-moóc', 45, 40),
+(N'DE',  N'Cấp cho người lái xe hạng D được phép kéo rơ-moóc hoặc xe chở khách nối toa.', N'Ô tô kéo rơ-moóc', 45, 40);
+GO
+
+-- 6️⃣ HO_SO_THI_SINH
+INSERT INTO HO_SO_THI_SINH (HOCVIEN_ID, TENHOSO, NGAYDANGKY, TRANGTHAI, GHICHU, KHAMSUCKHOE_ID, HANG_ID)
+VALUES
+(1, N'Hồ sơ thi A1 - Nguyễn Văn Dũng', '2025-01-10', N'Đang xử lý', N'---', 1, 1),
+(2, N'Hồ sơ thi B1 - Trần Thị Kim Anh', '2025-02-15', N'Đã duyệt', N'---', 2, 3),
+(3, N'Hồ sơ thi B1 - Phạm Hoàng Nam', '2025-03-01', N'Đang xử lý', N'---', 3, 3);
+GO
+
+-- 7 PHIEU_THANH_TOAN
+INSERT INTO PHIEU_THANH_TOAN (TENPHIEU, NGAYLAP, TONGTIEN, NGAYNOP, ANHMINHCHUNG, TRANGTHAI)
+VALUES 
+(N'Phiếu thanh toán Hồ sơ A1 - Nguyễn Văn Dũng', '2025-01-15', 150000, '2025-01-16', N'/uploads/phieu/a1_dung.jpg', N'Đã Thanh Toán'),
+
+(N'Phiếu thanh toán Hồ sơ B1 - Trần Thị Kim Anh', '2025-02-20', 300000, '2025-02-21', N'/uploads/phieu/b1_kimanh.png', N'Đã Thanh Toán'),
+
+(N'Phiếu thanh toán Hồ sơ B2 - Phạm Hoàng Nam', '2025-03-05', 250000, '2025-03-06', N'/uploads/phieu/b2_hoangnam.jpg', N'Đã Thanh Toán');
+
+
+-- 8 CHI_TIET_PHIEU_THANH_TOAN
+INSERT INTO CHI_TIET_PHIEU_THANH_TOAN (HOSO_ID, PHIEU_ID, LOAIPHI, GHICHU)
+VALUES
+(1, 1, N'Lệ phí thi A1', N'Đóng phí cho học viên Nguyễn Văn Dũng'),
+(2, 2, N'Lệ phí thi B1', N'Đóng phí cho học viên Trần Thị Kim Anh'),
+(3, 3, N'Lệ phí thi B2 nâng hạng', N'Đóng phí cho học viên Phạm Hoàng Nam');
+
+-- 9 GIAY_PHEP_LAI_XE
+INSERT INTO GIAY_PHEP_LAI_XE (NGAYCAP, NGAYHETHAN, TRANGTHAI, HOSO_ID)
+VALUES
+('2025-05-01', '2030-05-01', N'Còn hạn', 1),
+('2025-06-01', '2030-06-01', N'Còn hạn', 2),
+('2025-07-01', '2030-07-01', N'Còn hạn', 3);
+GO
+
+-- Bổ sung dữ liệu cho bảng CHI_TIET_GPLX dựa trên dữ liệu hiện có
+INSERT INTO CHI_TIET_GPLX (HANG_ID, GPLX_ID, NGAY_CAP_CTGP)
+SELECT
+    hs.HANG_ID,
+    g.GPLX_ID,
+    g.NGAYCAP
+FROM GIAY_PHEP_LAI_XE g
+JOIN HO_SO_THI_SINH hs ON g.HOSO_ID = hs.HOSO_ID;
+GO
+
+-- 10 KHOA_HOC
+INSERT INTO KHOA_HOC (HANG_ID, NGAYBATDAU, NGAYKETTHUC, DIADIEM, TRANGTHAI)
+VALUES
+(1, '2025-01-10', '2025-03-10', N'Trung tâm số 1', NULL),
+(1, '2025-04-01', '2025-06-01', N'Trung tâm số 2', NULL),
+(1, '2025-12-20', '2026-01-10', N'Trung tâm số 3', NULL),
+(2, '2025-02-15', '2025-04-15', N'Trung tâm số 1', NULL),
+(2, '2025-05-10', '2025-07-10', N'Trung tâm số 2', NULL),
+(2, '2025-10-01', '2025-12-10', N'Trung tâm số 3', NULL),
+(3, '2025-03-20', '2025-05-20', N'Trung tâm số 1', NULL),
+(3, '2025-12-15', '2025-12-30', N'Trung tâm số 2', NULL),
+(3, '2025-09-15', '2025-11-15', N'Trung tâm số 3', NULL),
+(3, '2025-12-18', '2026-02-01', N'Trung tâm số 1', NULL);
+GO
+
+UPDATE KHOA_HOC
+SET TRANGTHAI =
+    CASE
+        WHEN NGAYBATDAU > CAST(GETDATE() AS DATE) THEN N'Sắp khai giảng'
+        WHEN NGAYKETTHUC < CAST(GETDATE() AS DATE) THEN N'Đã kết thúc'
+        ELSE N'Đang học'
+    END;
+GO
+
+
+
+
+-- 11 KY_THI
+INSERT INTO KY_THI (TENKYTHI, LOAIKYTHI, TRANGTHAI)
+VALUES
+(N'Kỳ thi GPLX- A1', N'Tốt nghiệp', 0),
+(N'Kỳ thi GPLX- B1', N'Sát Hạch',0),
+(N'Kỳ thi GPLX- B', N'Tốt nghiệp',0);
+GO
+
+-- 12BAI_THI
+INSERT INTO BAI_THI (TENBAITHI, MOTA, LOAIBAITHI, KYTHI_ID)
+VALUES
+(N'Bài thi A1 - Lý thuyết', N'Gồm 25 câu hỏi trắc nghiệm', N'Lý thuyết', 1),
+(N'Bài thi B1 - Thực hành', N'Lái xe trong sa hình', N'Thực hành', 2),
+(N'Bài thi B - Tổng hợp', N'Thi tổng hợp lý thuyết và thực hành', N'Tổng hợp', 3);
+GO
+
+-- 13 LICH_THI
+INSERT INTO LICH_THI (THOIGIANTHI, DIADIEM,KYTHI_ID)
+VALUES
+('2025-12-15 08:00', N'Sân thi số 1',1),
+('2026-06-01 08:00', N'Sân thi số 2',2),
+('2026-06-01 08:00', N'Sân thi số 3',3);
+GO
+
+-- 1️4 CHI_TIET_KET_QUA_THI
+INSERT INTO CHI_TIET_KET_QUA_THI (BAITHI_ID, HOSO_ID, KET_QUA_DAT_DUOC, TONG_DIEM)
+VALUES
+(1, 1, N'Đạt', 9.0),
+(2, 2, N'Không đạt', 6.0),
+(3, 3, N'Đạt', 8.0);
+GO
+
+DELETE FROM CHI_TIET_KET_QUA_HOC_TAP;
+DBCC CHECKIDENT ('CHI_TIET_KET_QUA_HOC_TAP', RESEED, 1);
+-- 15 CHI_TIET_KET_QUA_HOC_TAP
+INSERT INTO CHI_TIET_KET_QUA_HOC_TAP
+(KHOAHOC_ID, LYTHUYET_KQ, SAHINH_KQ, DUONGTRUONG_KQ, MOPHONG_KQ)
+VALUES
+(1, 1, 1, 1, 1),   -- Học viên 1: Hoàn thành hết
+(2, 1, 1, 1, 1),   -- Học viên 2: Hoàn thành hết
+(3, 0, 1, 0, 0);   -- Học viên 3: Không hoàn thành các mục tương ứng
+GO
+
+--16 KET_QUA_HOC_TAP
+INSERT INTO KET_QUA_HOC_TAP
+(KETQUAHOCTAP_ID, HOSO_ID, NHANXET, SOBUOIHOC, SOBUOIVANG, SOKMHOANTHANH)
+VALUES
+(1, 1, N'Học tốt, đủ điều kiện thi', 40, 1, N'Hoàn thành 100%'),
+(2, 2, N'Tiến bộ tốt, chăm chỉ', 42, 0, N'Hoàn thành 100%'),
+(3, 3, N'Cần luyện tập thêm thực hành', 40, 4, N'Hoàn thành 60%');
+GO
+
+ALTER TABLE HANG_GPLX
+ADD HOCPHI DECIMAL(18,2) NULL;
+go
+ALTER TABLE KHOA_HOC 
+ADD TENKHOAHOC NVARCHAR(200) NULL;
+
+go
+--UPDATE HOC_PHI
+UPDATE HANG_GPLX SET HOCPHI = 650000 WHERE TENHANG = 'A1';
+UPDATE HANG_GPLX SET HOCPHI = 1500000 WHERE TENHANG = 'A';
+UPDATE HANG_GPLX SET HOCPHI = 12000000 WHERE TENHANG = 'B1';
+UPDATE HANG_GPLX SET HOCPHI = 13000000 WHERE TENHANG = 'B';
+UPDATE HANG_GPLX SET HOCPHI = 17000000 WHERE TENHANG = 'C1';
+UPDATE HANG_GPLX SET HOCPHI = 18500000 WHERE TENHANG = 'C';
+UPDATE HANG_GPLX SET HOCPHI = 25000000 WHERE TENHANG = 'D1';
+UPDATE HANG_GPLX SET HOCPHI = 26000000 WHERE TENHANG = 'D2';
+UPDATE HANG_GPLX SET HOCPHI = 28500000 WHERE TENHANG = 'D';
+UPDATE HANG_GPLX SET HOCPHI = 20000000 WHERE TENHANG = 'BE';
+UPDATE HANG_GPLX SET HOCPHI = 22000000 WHERE TENHANG = 'C1E';
+UPDATE HANG_GPLX SET HOCPHI = 25000000 WHERE TENHANG = 'CE';
+UPDATE HANG_GPLX SET HOCPHI = 30000000 WHERE TENHANG = 'D1E';
+UPDATE HANG_GPLX SET HOCPHI = 32000000 WHERE TENHANG = 'D2E';
+UPDATE HANG_GPLX SET HOCPHI = 35000000 WHERE TENHANG = 'DE';
+go
+
+CREATE TRIGGER TRG_AUTO_TENKHOAHOC
+ON KHOA_HOC
+AFTER INSERT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    ;WITH NewKH AS (
+        SELECT 
+            i.KHOAHOC_ID,
+            i.HANG_ID,
+            ROW_NUMBER() OVER (
+                PARTITION BY i.HANG_ID 
+                ORDER BY i.KHOAHOC_ID
+            ) AS RN
+        FROM INSERTED i
+    )
+    UPDATE kh
+    SET TENKHOAHOC =
+        N'Khóa học lái xe Hạng ' + h.TENHANG +
+        N' - K' + RIGHT('00' + CAST(NK.RN AS VARCHAR(3)), 3)
+    FROM KHOA_HOC kh
+    JOIN NewKH NK ON kh.KHOAHOC_ID = NK.KHOAHOC_ID
+    JOIN HANG_GPLX h ON NK.HANG_ID = h.HANG_ID;
+
+END;
+GO
+
+
+;WITH CTE AS (
+    SELECT 
+        KHOAHOC_ID,
+        HANG_ID,
+        ROW_NUMBER() OVER (PARTITION BY HANG_ID ORDER BY KHOAHOC_ID) AS RN
+    FROM KHOA_HOC
+)
+UPDATE KHOA_HOC
+SET TENKHOAHOC = 
+    N'Khóa học lái xe Hạng ' + H.TENHANG + 
+    N' - K' + RIGHT('00' + CAST(CTE.RN AS VARCHAR(2)), 2)
+FROM CTE
+JOIN HANG_GPLX H ON CTE.HANG_ID = H.HANG_ID
+WHERE KHOA_HOC.KHOAHOC_ID = CTE.KHOAHOC_ID; 

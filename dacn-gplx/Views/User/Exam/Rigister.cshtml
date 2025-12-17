@@ -1,0 +1,72 @@
+﻿@model dacn_gplx.Models.KyThi
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Đăng ký kỳ thi";
+
+    var currentHosoIds = ViewBag.HosoIds as List<int> ?? new List<int>();
+    var schedules = Model.LichThis.OrderBy(l => l.Thoigianthi).ToList();
+    bool hasRegistered = currentHosoIds.Any() && Model.ChiTietDangKyThis.Any(c => currentHosoIds.Contains(c.HosoId));
+}
+
+<section class="content-header">
+    <div class="container-fluid">
+        <h1>Đăng ký kỳ thi: @Model.Tenkythi</h1>
+        <small class="text-muted">@Model.Loaikythi</small>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success">@TempData["Success"]</div>
+        }
+
+        @if (TempData["Warning"] != null)
+        {
+            <div class="alert alert-warning">@TempData["Warning"]</div>
+        }
+
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <p><strong>Số học viên đã đăng ký:</strong> @Model.ChiTietDangKyThis.Count</p>
+
+                <h5>Danh sách lịch thi</h5>
+                @if (schedules.Any())
+                {
+                    <ul class="list-group mb-3">
+                        @foreach (var schedule in schedules)
+                        {
+                            <li class="list-group-item">
+                                @schedule.Thoigianthi?.ToString("dd/MM/yyyy HH:mm") tại @schedule.Diadiem
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>Hiện chưa có lịch thi nào.</p>
+                }
+
+                @* Hiển thị nút đăng ký nếu học viên chưa đăng ký *@
+                @if (!hasRegistered && currentHosoIds.Any())
+                {
+                    <form asp-action="Register" method="post">
+                        <input type="hidden" name="id" value="@Model.KythiId" />
+                        <button type="submit" class="btn btn-primary">Đăng ký kỳ thi</button>
+                    </form>
+                }
+                else if (hasRegistered)
+                {
+                    <span class="badge bg-success mt-2">Bạn đã đăng ký kỳ thi này</span>
+                }
+            </div>
+        </div>
+
+        <div class="text-end">
+            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách kỳ thi</a>
+        </div>
+    </div>
+</section>

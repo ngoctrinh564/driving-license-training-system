@@ -1,0 +1,187 @@
+﻿@model dacn_gplx.Models.KhoaHoc
+@inject dacn_gplx.Models.QuanLyGplxContext Db
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Thêm khóa học";
+
+    var hangList = Db.HangGplxes.ToList();
+    var diaDiemList = new List<string>
+    {
+        "Trung tâm số 1",
+        "Trung tâm số 2",
+        "Trung tâm số 3"
+    };
+}
+
+<div class="card shadow">
+    <div class="card-header">
+        <h4 class="mb-0">Thêm khóa học</h4>
+    </div>
+
+    <div class="card-body">
+
+        @* Hiển thị lỗi tổng *@
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.Values.Any(v => v.Errors.Count > 0))
+        {
+            <div class="alert alert-danger mb-3">
+                <i class="fas fa-exclamation-triangle"></i> Vui lòng kiểm tra lại các thông tin.
+            </div>
+        }
+
+        <form asp-action="Create" method="post">
+
+            <div class="row">
+
+                <!-- Cột trái -->
+                <div class="col-md-6">
+
+                    <!-- Hạng GPLX -->
+                    <div class="form-group">
+                        <label>Hạng GPLX <span class="text-danger">*</span></label>
+                        <select id="HangId" name="HangId" class="form-control" required>
+                            <option value="">-- Chọn hạng GPLX --</option>
+                            @foreach (var h in hangList)
+                            {
+                                <option value="@h.HangId"
+                                        data-hocphi="@h.Hocphi">
+                                    @h.Tenhang
+                                </option>
+                            }
+                        </select>
+                        <span asp-validation-for="HangId" class="text-danger"></span>
+                    </div>
+
+                    <!-- Học phí -->
+                    <div class="form-group">
+                        <label>Học phí</label>
+                        <input id="HocPhiDisplay" class="form-control" placeholder="Chọn hạng để tự hiển thị" readonly />
+                    </div>
+
+                    <!-- Tên khóa học (preview) -->
+                    <div class="form-group">
+                        <label>Tên khóa học</label>
+                        <input id="TenKhoaHocPreview"
+                               class="form-control"
+                               placeholder="Tên sẽ tự tạo khi lưu"
+                               readonly />
+                        <small class="form-text text-muted">
+                            Tên sẽ được trigger SQL tự sinh.
+                        </small>
+                    </div>
+
+                </div>
+
+                <!-- Cột phải -->
+                <div class="col-md-6">
+
+                    <!-- Địa điểm -->
+                    <div class="form-group">
+                        <label>Địa điểm <span class="text-danger">*</span></label>
+                        <select name="Diadiem" class="form-control" required>
+                            <option value="">-- Chọn địa điểm --</option>
+                            @foreach (var d in diaDiemList)
+                            {
+                                <option value="@d">@d</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Diadiem" class="text-danger"></span>
+                    </div>
+
+                    <!-- Ngày bắt đầu -->
+                    <div class="form-group">
+                        <label>Ngày bắt đầu <span class="text-danger">*</span></label>
+                        <input type="date" id="Ngaybatdau" name="Ngaybatdau" class="form-control" required />
+                        <span asp-validation-for="Ngaybatdau" class="text-danger"></span>
+                    </div>
+
+                    <!-- Ngày kết thúc -->
+                    <div class="form-group">
+                        <label>Ngày kết thúc <span class="text-danger">*</span></label>
+                        <input type="date" id="Ngayketthuc" name="Ngayketthuc" class="form-control" required />
+                        <span asp-validation-for="Ngayketthuc" class="text-danger"></span>
+                    </div>
+
+                </div>
+            </div>
+
+            <hr />
+
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-save"></i> Lưu khóa học
+            </button>
+
+            @* Nút Huỷ: quay lại trang Index *@
+            <a asp-controller="KhoaHoc"
+               asp-action="Index"
+               class="btn btn-secondary ml-2">
+                Huỷ
+            </a>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // ==========================
+        // Auto học phí + tên khóa học
+        // ==========================
+        document.getElementById("HangId").addEventListener("change", function () {
+
+            const opt = this.options[this.selectedIndex];
+
+            if (!opt.value) {
+                document.getElementById("HocPhiDisplay").value = "";
+                document.getElementById("TenKhoaHocPreview").value = "";
+                return;
+            }
+
+            const hocphi = parseInt(opt.getAttribute("data-hocphi")) || 0;
+
+            // format tiền
+            document.getElementById("HocPhiDisplay").value =
+                hocphi.toLocaleString("vi-VN");
+
+            // preview tên khóa học
+            const tenhang = opt.text;
+            document.getElementById("TenKhoaHocPreview").value =
+                "Khóa học lái xe Hạng " + tenhang + " - (sẽ tự sinh mã)";
+        });
+
+        // ==========================
+        // Validate ngày ở client
+        // ==========================
+        const startInput = document.getElementById("Ngaybatdau");
+        const endInput = document.getElementById("Ngayketthuc");
+
+        function validateDates() {
+
+            if (!startInput.value || !endInput.value) return;
+
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            const start = new Date(startInput.value);
+            const end = new Date(endInput.value);
+
+            // bắt đầu > hôm nay (không được =)
+            if (start <= today) {
+                alert("Ngày bắt đầu phải lớn hơn ngày hiện tại.");
+                startInput.value = "";
+                startInput.focus();
+                return;
+            }
+
+            if (end <= start) {
+                alert("Ngày kết thúc phải lớn hơn ngày bắt đầu.");
+                endInput.value = "";
+                endInput.focus();
+                return;
+            }
+        }
+
+        startInput.addEventListener("change", validateDates);
+        endInput.addEventListener("change", validateDates);
+    </script>
+}

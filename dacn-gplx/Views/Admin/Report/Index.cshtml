@@ -1,0 +1,254 @@
+﻿@model dacn_gplx.ViewModels.Reports.DashboardReportVM
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Báo cáo thống kê";
+}
+
+@* <div class="content-header">
+    <div class="container-fluid">
+        <h3 class="mb-0">BÁO CÁO THỐNG KÊ</h3>
+    </div>
+</div> *@
+
+<div class="content">
+    <div class="container-fluid">
+
+        <!-- FILTER -->
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex align-items-center">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-filter"></i> Bộ lọc báo cáo
+                    </h3>
+
+                    <div class="ml-auto">
+                        <button id="btnOpenExportModal" class="btn btn-danger">
+                            <i class="fas fa-file-pdf"></i> Xuất báo cáo
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <form id="filterForm">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Từ ngày</label>
+                            <input type="date" class="form-control" name="fromDate"
+                                   value="@(Model.FromDate?.ToString("yyyy-MM-dd") ?? "")" />
+                        </div>
+                        <div class="col-md-3">
+                            <label>Đến ngày</label>
+                            <input type="date" class="form-control" name="toDate"
+                                   value="@(Model.ToDate?.ToString("yyyy-MM-dd") ?? "")" />
+                        </div>
+
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button class="btn btn-primary w-100" type="submit">
+                                <i class="fas fa-search"></i> Tìm kiếm
+                            </button>
+                        </div>
+
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button class="btn btn-secondary w-100" id="btnReset" type="button">
+                                <i class="fas fa-undo"></i> Reset
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- TABS -->
+        <div class="card mt-3">
+            <div class="card-header p-0">
+                <ul class="nav nav-tabs" id="reportTabs">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="javascript:void(0)" data-tab="overview">Tổng quan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="javascript:void(0)" data-tab="users">Người dùng</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="javascript:void(0)" data-tab="courses">Khóa học</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="javascript:void(0)" data-tab="exams">Kỳ thi</a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="card-body">
+                <div id="tabContent">
+                    @await Html.PartialAsync("~/Views/Admin/Report/_TabOverview.cshtml", Model)
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<!-- Model xuất báo cáo -->
+<div class="modal fade" id="exportPdfModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <div class="modal-header bg-danger">
+                <h5 class="modal-title text-white">
+                    <i class="fas fa-file-pdf mr-2"></i>
+                    Xác nhận xuất báo cáo
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body">
+                <p class="mb-2">
+                    Bạn đang chuẩn bị xuất báo cáo với các thông tin sau:
+                </p>
+
+                <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span><b>Thời gian</b></span>
+                        <span id="exportTimeRange"></span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span><b>Loại báo cáo</b></span>
+                        <span id="exportTabName"></span>
+                    </li>
+                </ul>
+
+                <div class="alert alert-info mt-3 mb-0">
+                    <i class="fas fa-info-circle mr-1"></i>
+                    File PDF sẽ bao gồm biểu đồ và dữ liệu chi tiết theo bộ lọc hiện tại.
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-dismiss="modal">
+                    Hủy
+                </button>
+
+                <button id="btnConfirmExportPdf" class="btn btn-danger">
+                    <i class="fas fa-file-export"></i>
+                    Xuất PDF
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // giữ state tab hiện tại
+        let currentTab = "overview";
+
+        // registry chart để destroy trước khi vẽ lại (tránh lỗi chồng chart)
+        window.__charts = window.__charts || {};
+
+        function destroyChart(key) {
+            if (window.__charts[key]) {
+                window.__charts[key].destroy();
+                window.__charts[key] = null;
+            }
+        }
+
+        function showLoading() {
+            $("#tabContent").html(`
+                <div class="text-center p-5">
+                    <div class="spinner-border" role="status"></div>
+                    <div class="mt-2">Đang tải...</div>
+                </div>
+            `);
+        }
+
+        function loadTab(tab) {
+            currentTab = tab;
+
+            // active tab UI
+            $("#reportTabs .nav-link").removeClass("active");
+            $(`#reportTabs .nav-link[data-tab='${tab}']`).addClass("active");
+
+            showLoading();
+
+            const query = $("#filterForm").serialize();
+            $.get(`/Admin/Report/Tab/${tab}`, query, function (html) {
+                $("#tabContent").html(html);
+                // sau khi inject HTML, gọi hook render chart của partial
+                if (window.__renderTabCharts) {
+                    window.__renderTabCharts();
+                }
+            });
+        }
+
+        $("#reportTabs .nav-link").click(function () {
+            const tab = $(this).data("tab");
+            loadTab(tab);
+        });
+
+        $("#filterForm").submit(function (e) {
+            e.preventDefault();
+            loadTab(currentTab); // chỉ reload nội dung tab, không reload trang
+        });
+
+        $("#btnReset").click(function () {
+            $("#filterForm")[0].reset();
+            loadTab(currentTab);
+        });
+
+        // render chart lần đầu (tab Overview)
+        $(document).ready(function () {
+            if (window.__renderTabCharts) {
+                window.__renderTabCharts();
+            }
+        });
+
+        function getActiveTabName() {
+            return $(".nav-link.active").text().trim();
+        }
+
+        function getDateValue(name) {
+            const val = $(`input[name='${name}']`).val();
+            return val ? val : "Tất cả";
+        }
+
+        function buildTimeRangeText() {
+            const fromDate = $("input[name='fromDate']").val();
+            const toDate = $("input[name='toDate']").val();
+
+            if (!fromDate && !toDate) {
+                return "Tất cả";
+            }
+
+            const fromText = fromDate ? fromDate : "Tất cả";
+            const toText = toDate ? toDate : "Tất cả";
+
+            return `${fromText} → ${toText}`;
+        }
+
+        $("#btnOpenExportModal").click(function () {
+
+            const timeRangeText = buildTimeRangeText();
+            const tabName = getActiveTabName();
+
+            $("#exportTimeRange").text(timeRangeText);
+            $("#exportTabName").text(tabName);
+
+            $("#exportPdfModal").modal("show");
+        });
+
+        $("#btnConfirmExportPdf").click(function () {
+
+            const params = $("#filterForm").serialize();
+            const tab = $(".nav-link.active").data("tab");
+
+            window.location.href =
+                `/Admin/Report/ExportPdf?${params}&tab=${tab}`;
+
+            $("#exportPdfModal").modal("hide");
+        });
+
+    </script>
+}

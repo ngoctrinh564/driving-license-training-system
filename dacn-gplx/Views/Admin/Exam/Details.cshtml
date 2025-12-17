@@ -1,0 +1,121 @@
+﻿@model dacn_gplx.Models.KyThi
+
+@{
+    ViewData["Title"] = "Chi Tiết Kì Thi: " + Model.Tenkythi;
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    var now = DateTime.Now;
+    int soHV = ViewBag.SoDangKy ?? 0;
+    int soHVToiThieu = 3; // Số HV tối thiểu để tổ chức
+}
+
+<section class="content">
+    <div class="container-fluid">
+
+        <!-- THÔNG TIN KÌ THI -->
+        <div class="card">
+            <div class="card-header">
+            </div>
+            <div class="card-body">
+                <dl class="row">
+                    <dt class="col-sm-3">ID Kì Thi</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.KythiId)</dd>
+
+                    <dt class="col-sm-3">Tên Kì Thi</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Tenkythi)</dd>
+
+                    <dt class="col-sm-3">Loại Kì Thi</dt>
+                    <dd class="col-sm-9">@Html.DisplayFor(model => model.Loaikythi)</dd>
+
+                    <dt class="col-sm-3">Số học viên đã đăng ký</dt>
+                    <dd class="col-sm-9">
+                        <span class="badge badge-primary">@soHV</span>
+                    </dd>
+                </dl>
+            </div>
+        </div>
+
+        <!-- DANH SÁCH LỊCH THI -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h3 class="card-title">
+                    Lịch Thi Thuộc Kì Thi Này (@Model.LichThis.Count())
+                </h3>
+                <div class="card-tools">
+                    <a asp-action="CreateSchedule"
+                       asp-route-examId="@Model.KythiId"
+                       class="btn btn-success btn-sm">
+                        <i class="fas fa-plus"></i> Thêm Lịch Thi
+                    </a>
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Thời Gian Thi</th>
+                            <th>Địa Điểm</th>
+                            <th>Trạng thái</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.LichThis.Any())
+                        {
+                            foreach (var lich in Model.LichThis.OrderBy(l => l.Thoigianthi))
+                            {
+                                string trangThai = "Chưa xác định";
+                                string badgeClass = "badge badge-secondary";
+
+                                if (lich.Thoigianthi.HasValue)
+                                {
+                                    if (lich.Thoigianthi.Value > now)
+                                    {
+                                        trangThai = "Kỳ thi sắp được tổ chức";
+                                        badgeClass = "badge badge-warning";
+                                    }
+                                    else
+                                    {
+                                        if (soHV < soHVToiThieu)
+                                        {
+                                            trangThai = "Kỳ thi bị hủy";
+                                            badgeClass = "badge badge-danger";
+                                        }
+                                        else
+                                        {
+                                            trangThai = "Kỳ thi đã bắt đầu";
+                                            badgeClass = "badge badge-success";
+                                        }
+                                    }
+                                }
+
+                                <tr>
+                                    <td>@(lich.Thoigianthi?.ToString("dd/MM/yyyy HH:mm"))</td>
+                                    <td>@lich.Diadiem</td>
+                                    <td>
+                                        <span class="@badgeClass">@trangThai</span>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="3" class="text-center">
+                                    Chưa có lịch thi nào được tạo cho kì thi này.
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- QUAY LẠI -->
+        <div class="card-footer text-left">
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </a>
+        </div>
+
+    </div>
+</section>

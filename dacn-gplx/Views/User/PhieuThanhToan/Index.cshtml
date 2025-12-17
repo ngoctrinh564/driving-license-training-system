@@ -1,0 +1,54 @@
+﻿@model List<dacn_gplx.Models.PhieuThanhToan>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="text-center mb-4">📄 Danh sách Phiếu Thanh Toán</h2>
+
+<div class="row">
+    @foreach (var phieu in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+
+                <div class="card-body d-flex flex-column">
+
+                    <!-- Tên phiếu -->
+                    <h5 class="card-title text-primary fw-bold text-truncate">
+                        @phieu.Tenphieu
+                    </h5>
+
+                    <!-- Ngày lập, Ngày nộp & Tổng tiền -->
+                    <p class="card-text text-muted mb-2">
+                        <strong>Ngày lập:</strong> @(phieu.Ngaylap?.ToString("dd/MM/yyyy") ?? "—")<br />
+                        <strong>Ngày nộp:</strong> @(phieu.Ngaynop?.ToString("dd/MM/yyyy") ?? "Chưa nộp")<br />
+                        <strong>Tổng tiền:</strong> <span class="text-danger fw-bold">@phieu.Tongtien?.ToString("N0")</span><br />
+
+                        <!-- Trạng thái -->
+                        <strong>Trạng thái:</strong>
+                        @if (string.IsNullOrEmpty(phieu.Trangthai) || phieu.Trangthai == "Chưa Thanh Toán")
+                        {
+                            <span class="badge bg-warning text-dark">Chưa thanh toán</span>
+                        }
+                        else if (phieu.Trangthai == "Chờ Xác Thực")
+                        {
+                            <span class="badge bg-info text-dark">Chờ xác thực</span>
+                        }
+                        else if (phieu.Trangthai == "Đã Thanh Toán")
+                        {
+                            <span class="badge bg-success">Đã thanh toán</span>
+                        }
+                    </p>
+
+                    <!-- Nút Xem chi tiết -->
+                    <a href="@Url.Action("Detail", "PhieuThanhToan", new { id = phieu.PhieuId })"
+                       class="btn btn-primary mt-auto w-100">
+                        Xem chi tiết
+                    </a>
+
+                </div>
+            </div>
+        </div>
+    }
+</div>

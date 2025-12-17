@@ -1,0 +1,181 @@
+﻿@using dacn_gplx.ViewModels
+@model RegisterViewModel
+
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+<style>
+    body {
+        background: #e9f2ff;
+    }
+
+    .register-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 40px;
+        margin-bottom: 40px;
+    }
+
+    .register-box {
+        width: 520px;
+        padding: 35px;
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+    .register-title {
+        text-align: center;
+        font-size: 28px;
+        font-weight: 800;
+        color: #0066ff;
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        font-weight: 600;
+    }
+
+    .password-wrapper {
+        position: relative;
+    }
+
+        .password-wrapper input {
+            padding-right: 42px;
+        }
+
+    .toggle-password {
+        position: absolute;
+        bottom: 10px;
+        right: 12px;
+        cursor: pointer;
+        font-size: 18px;
+        color: #888;
+    }
+
+        .toggle-password:hover {
+            color: #0066ff;
+        }
+
+    .btn-register {
+        background: linear-gradient(90deg, #00c853, #009624);
+        border: none;
+        font-weight: 600;
+        padding: 10px;
+        font-size: 17px;
+    }
+
+        .btn-register:hover {
+            background: linear-gradient(90deg, #00b84d, #008f20);
+        }
+
+    .link-custom {
+        color: #005ce6;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+        .link-custom:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<div class="register-wrapper">
+    <div class="register-box">
+
+        <h2 class="register-title">Đăng Ký Tài Khoản</h2>
+
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger mt-2">
+                @foreach (var err in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <div>@err.ErrorMessage</div>
+                }
+            </div>
+        }
+
+        <form method="post">
+            <div class="mb-3">
+                <label asp-for="Username" class="form-label">Tên đăng nhập</label>
+                <input asp-for="Username" class="form-control" />
+            </div>
+
+            <div class="mb-3 password-wrapper">
+                <label asp-for="Password" class="form-label">Mật khẩu</label>
+                <input asp-for="Password" id="password1" class="form-control" />
+                <i class="fa-solid fa-eye toggle-password"
+                   onclick="togglePassword('password1', this)"></i>
+            </div>
+
+            <div class="mb-3 password-wrapper">
+                <label asp-for="ConfirmPassword" class="form-label">Xác nhận mật khẩu</label>
+                <input asp-for="ConfirmPassword" id="password2" class="form-control" />
+                <i class="fa-solid fa-eye toggle-password"
+                   onclick="togglePassword('password2', this)"></i>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Hoten" class="form-label">Họ và tên</label>
+                <input asp-for="Hoten" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="SoCmndCccd" class="form-label">Số CCCD</label>
+                <input asp-for="SoCmndCccd" class="form-control" />
+            </div>
+
+            <!-- ✅ NGÀY SINH: không cho chọn > hôm nay -->
+            <div class="mb-3">
+                <label asp-for="Namsinh" class="form-label">Ngày sinh</label>
+                <input asp-for="Namsinh" id="namsinh" type="date" class="form-control" />
+                <span asp-validation-for="Namsinh" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Sdt" class="form-label">Số điện thoại</label>
+                <input asp-for="Sdt" class="form-control" />
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Mail" class="form-label">Email</label>
+                <input asp-for="Mail" class="form-control" />
+            </div>
+
+            <button type="submit" class="btn btn-success btn-register w-100 mt-3">
+                Đăng ký
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="/Auth/Login" class="link-custom">
+                Đã có tài khoản? Đăng nhập
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function togglePassword(id, icon) {
+        const input = document.getElementById(id);
+        if (input.type === "password") {
+            input.type = "text";
+            icon.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+            input.type = "password";
+            icon.classList.replace("fa-eye-slash", "fa-eye");
+        }
+    }
+
+    // ✅ set max = hôm nay để không chọn ngày sinh tương lai
+    (function () {
+        const el = document.getElementById("namsinh");
+        if (!el) return;
+
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, "0");
+        const dd = String(today.getDate()).padStart(2, "0");
+        el.max = `${yyyy}-${mm}-${dd}`;
+    })();
+</script>

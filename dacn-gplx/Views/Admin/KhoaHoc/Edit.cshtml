@@ -1,0 +1,86 @@
+﻿@model dacn_gplx.Models.KhoaHoc
+@inject dacn_gplx.Models.QuanLyGplxContext Db
+
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Sửa khóa học";
+}
+<div class="card shadow">
+
+    <div class="card-body">
+
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger">@TempData["Error"]</div>
+        }
+
+        <form asp-action="Edit" method="post">
+
+            <input type="hidden" asp-for="KhoahocId" />
+
+            <div class="row">
+
+                <!-- Cột trái -->
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <label>Tên khóa học</label>
+                        <input class="form-control" value="@Model.TenKhoaHoc" readonly />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hạng GPLX</label>
+                        <select asp-for="HangId" class="form-control" asp-items="ViewBag.HangList"></select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Học phí</label>
+                        <input class="form-control" value="@Model.Hang?.Hocphi?.ToString("N0")" readonly />
+                    </div>
+
+                </div>
+
+                <!-- Cột phải -->
+                <div class="col-md-6">
+
+                    <div class="form-group">
+                        <label>Địa điểm</label>
+                        <select asp-for="Diadiem" class="form-control">
+                            @foreach (var d in ViewBag.DiaDiemList)
+                            {
+                                <option value="@d" selected="@(Model.Diadiem == d)">
+                                    @d
+                                </option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngày bắt đầu</label>
+                        <input asp-for="Ngaybatdau" type="date" class="form-control" />
+                        <span asp-validation-for="Ngaybatdau" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Ngày kết thúc</label>
+                        <input asp-for="Ngayketthuc" type="date" class="form-control" />
+                        <span asp-validation-for="Ngayketthuc" class="text-danger"></span>
+                    </div>
+
+                </div>
+            </div>
+
+            <hr />
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Lưu thay đổi
+            </button>
+
+            <a asp-action="Details" asp-route-id="@Model.KhoahocId" class="btn btn-secondary">
+                Quay lại
+            </a>
+
+        </form>
+
+    </div>
+</div>

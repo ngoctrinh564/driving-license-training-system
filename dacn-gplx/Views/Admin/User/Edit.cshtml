@@ -1,0 +1,70 @@
+﻿@model dacn_gplx.Models.User
+@{
+    Layout = "~/Views/Shared/_LayoutAdmin.cshtml";
+    ViewData["Title"] = "Sửa người dùng";
+
+    // Lấy username hiện tại
+    var currentUsername = User.Identity.Name;
+    bool isCurrentUser = !string.IsNullOrEmpty(currentUsername) && currentUsername.Equals(Model.Username, StringComparison.OrdinalIgnoreCase);
+}
+
+<div class="card">
+    <div class="card-body">
+        <form asp-controller="User" asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="UserId" />
+
+            <!-- Username -->
+            <div class="form-group">
+                <label>Username</label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <!-- Password -->
+            <div class="form-group">
+                <label>Password (không thể sửa)</label>
+                <input type="password" class="form-control" value="********" disabled="disabled" />
+                <small class="form-text text-muted">Bạn không thể thay đổi mật khẩu tại đây.</small>
+            </div>
+
+            <!-- Role -->
+            <div class="form-group">
+                <label>Role</label>
+                @if (isCurrentUser)
+                {
+                    <select class="form-control" disabled="disabled">
+                        <option>@(Model.Role?.Rolename ?? "Không có")</option>
+                    </select>
+                    <small class="form-text text-muted">Bạn không thể thay đổi Role của chính mình.</small>
+                }
+                else
+                {
+                    <select asp-for="RoleId" class="form-control" asp-items="@(ViewBag.Roles as SelectList)">
+                        <option value="">-- Chọn Role --</option>
+                    </select>
+                }
+            </div>
+
+            <!-- IsActive -->
+            <div class="form-group form-check">
+                @if (isCurrentUser)
+                {
+                    <input asp-for="Isactive" type="checkbox" class="form-check-input" disabled="disabled" checked="@Model.Isactive" />
+                    <label class="form-check-label">Kích hoạt (không thể thay đổi)</label>
+                }
+                else
+                {
+                    <input asp-for="Isactive" type="checkbox" class="form-check-input" />
+                    <label class="form-check-label">Kích hoạt</label>
+                }
+            </div>
+
+            <!-- Buttons -->
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Lưu thay đổi
+            </button>
+            <a asp-controller="User" asp-action="Index" class="btn btn-secondary">Hủy</a>
+        </form>
+    </div>
+</div>

@@ -1,0 +1,120 @@
+﻿@model List<dacn_gplx.Models.KhoaHoc>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var daDangKy = ViewBag.DaDangKy as List<int> ?? new List<int>();
+    var khoaHocHoanThanhDict = ViewBag.KhoaHocHoanThanhDict as Dictionary<int, bool> ?? new Dictionary<int, bool>();
+
+    var selectedHang = Context.Request.Query["hangId"].ToString();
+    var searchValue = Context.Request.Query["search"].ToString();
+
+    var hangList = ViewBag.HangList as List<dacn_gplx.Models.HangGplx>;
+}
+
+<!-- ===================== POPUP XÁC NHẬN ===================== -->
+@if (TempData["ConfirmMessage"] != null)
+{
+    <div class="modal show" style="display:block; background:rgba(0,0,0,0.6); position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999;">
+        <div class="modal-dialog" style="margin-top:10%;">
+            <div class="modal-content p-3">
+
+                <h4 class="text-warning mb-2">
+                    <i class="fa fa-exclamation-triangle"></i> Cảnh báo
+                </h4>
+
+                <p class="mb-4">@TempData["ConfirmMessage"]</p>
+
+                <div class="d-flex justify-content-end">
+                    <a href="@TempData["ConfirmUrl"]" class="btn btn-primary me-2">Vẫn tiếp tục đăng ký</a>
+                    <a href="/DangKiKhoaHoc" class="btn btn-secondary">Hủy</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+}
+
+<section class="content-header mb-3">
+    <div class="container-fluid">
+        <h1>Danh sách khóa học sắp diễn ra</h1>
+    </div>
+</section>
+
+<section class="content">
+    <div class="container-fluid">
+
+        <!-- Tìm kiếm + lọc hạng -->
+        <form method="get" class="row g-3 mb-4">
+            <div class="col-md-4">
+                <input type="text" name="search" class="form-control"
+                       placeholder="Tìm khóa học..." value="@searchValue" />
+            </div>
+
+            <div class="col-md-3">
+                <select name="hangId" class="form-control hang-select">
+                    <option value="">-- Chọn hạng GPLX --</option>
+
+                    @if (hangList != null)
+                    {
+                        foreach (var h in hangList)
+                        {
+                            if (selectedHang == h.HangId.ToString())
+                            {
+                                <option value="@h.HangId" selected>@h.Tenhang</option>
+                            }
+                            else
+                            {
+                                <option value="@h.HangId">@h.Tenhang</option>
+                            }
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary">Lọc</button>
+            </div>
+        </form>
+
+        <!-- Thông báo -->   
+        @if (TempData["Warning"] != null)
+        {
+            <div class="alert alert-warning">@TempData["Warning"]</div>
+        }
+
+        <!-- Danh sách khóa học -->
+        <div class="row row-cols-1 row-cols-md-3 g-3">
+            @foreach (var kh in Model)
+            {
+                if (kh.Ngaybatdau.HasValue && kh.Ngaybatdau.Value >= DateOnly.FromDateTime(DateTime.Today))
+                {
+                    bool isDangKy = daDangKy.Contains(kh.KhoahocId);
+                    bool daHoanThanh = khoaHocHoanThanhDict.ContainsKey(kh.KhoahocId) && khoaHocHoanThanhDict[kh.KhoahocId];
+
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">@kh.TenKhoaHoc</h5>
+                                <p><strong>Hạng:</strong> @kh.Hang?.Tenhang</p>
+                                <p><strong>Ngày bắt đầu:</strong> @kh.Ngaybatdau?.ToString("dd/MM/yyyy")</p>
+                                <p><strong>Ngày kết thúc:</strong> @kh.Ngayketthuc?.ToString("dd/MM/yyyy")</p>
+                                <p><strong>Địa điểm:</strong> @kh.Diadiem</p>
+                            </div>
+
+                            <div class="card-footer text-center d-flex justify-content-around gap-2">
+
+                                <!-- Chi tiết -->
+                                <a href="@Url.Action("Details", "DangKiKhoaHoc", new { id = kh.KhoahocId })"
+                                   class="btn btn-info btn-sm flex-fill">Chi tiết</a>
+
+                                <!-- Luôn cho phép đăng ký (dù trùng hạng) -->
+                                <a href="@Url.Action("DangKy", "DangKiKhoaHoc", new { id = kh.KhoahocId })"
+                                   class="btn btn-primary btn-sm flex-fill">Đăng ký</a>                               
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</section>

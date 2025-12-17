@@ -1,0 +1,59 @@
+﻿@model List<dacn_gplx.Models.KetQuaHocTap>
+
+<h2 class="mb-4">Kết Quả Học Tập</h2>
+
+@if (Model == null || !Model.Any())
+{
+    <p class="text-center text-muted mt-4">
+        Bạn chưa có kết quả học tập.
+    </p>
+    <div class="text-center">
+        <a href="/DangKiKhoaHoc" class="btn btn-primary">Đăng ký khóa học</a>
+    </div>
+    return;
+}
+
+<div class="table-responsive">
+    <table class="table table-hover table-bordered align-middle">
+        <thead class="table-dark text-center">
+            <tr>
+                <th>Học viên</th>
+                <th>Khóa học</th>
+                <th>Số buổi học</th>
+                <th>Số buổi vắng</th>
+                <th>Số km hoàn thành</th>
+                <th>Nhận xét</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr class="text-center align-middle"
+                    style="cursor:pointer;"
+                    onclick="window.location='@Url.Action("ChiTietKetQua", "DangKiKhoaHoc", new { id = item.KetquahoctapId })'">
+
+                    <!-- Tên học viên -->
+                    <td>@item.Hoso?.Hocvien?.Hoten</td>
+
+                    <!-- Tên khóa học -->
+                    <td>@item.Ketquahoctap?.Khoahoc?.TenKhoaHoc</td>
+
+                    <td>@item.Sobuoihoc</td>
+                    <td>@item.Sobuoivang</td>
+
+                    <td>@(string.IsNullOrEmpty(item.Sokmhoanthanh) ? "Chưa hoàn thành" : item.Sokmhoanthanh)</td>
+
+                    <td>@(string.IsNullOrEmpty(item.Nhanxet) ? "Chưa có nhận xét" : item.Nhanxet)</td>
+
+                    <td>
+                        <a href="@Url.Action("ChiTietKetQua", "DangKiKhoaHoc", new { id = item.KetquahoctapId })"
+                           class="btn btn-info btn-sm">
+                            Chi tiết
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
